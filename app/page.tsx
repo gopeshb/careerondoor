@@ -1,101 +1,520 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import type React from "react"
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import {
+  Search,
+  Star,
+  ChevronRight,
+  Code,
+  Bug,
+  Users,
+  CheckCircle,
+  ArrowRight,
+  Cloud,
+} from "lucide-react"
+import Link from "next/link"
+import Image from "next/image"
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+// Company interface based on API response
+interface Company {
+  _id: string
+  name: string
+  website: string
+  avgRating: number
+  TotalReviews: number
+  verified: boolean
 }
+
+// Testimonials data
+const highlights = [
+  {
+    id: "1",
+    title: "🚀 Unlock Your Dream Job",
+    description: "Our platform helps you discover the best job opportunities quickly and efficiently.",
+    gradient: "from-yellow-400 to-orange-500",
+    icon: "💼",
+  },
+  {
+    id: "2",
+    title: "🌟 Get Insider Insights",
+    description: "Verified reviews reveal company culture, salaries, and real employee experiences.",
+    gradient: "from-pink-500 to-red-500",
+    icon: "🔍",
+  },
+  {
+    id: "3",
+    title: "⚡ Apply Instantly",
+    description: "One-click applications make job hunting effortless and stress-free.",
+    gradient: "from-green-400 to-teal-500",
+    icon: "⚡",
+  },]
+// Job categories for the showcase section
+const jobCategories = [
+  {
+    name: "Software Development",
+    count: "3,200+",
+    icon: <Code className="h-6 w-6 text-teal-500" />,
+    tags: ["Software Engineer", "Backend Developer", "Full Stack Developer"],
+  },
+  {
+    name: "Quality Assurance",
+    count: "1,500+",
+    icon: <Bug className="h-6 w-6 text-red-500" />,
+    tags: ["Software Tester", "QA Engineer", "Automation Tester"],
+  },
+  {
+    name: "Cloud & DevOps",
+    count: "2,000+",
+    icon: <Cloud className="h-6 w-6 text-blue-500" />,
+    tags: ["DevOps Engineer", "Cloud Architect", "Site Reliability Engineer"],
+  },
+];
+
+
+export default function HomePage() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [topCompanies, setTopCompanies] = useState<Company[]>([])
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  // Fetch top companies from API
+  useEffect(() => {
+    const fetchTopCompanies = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/companies/top/rating")
+        if (!response.ok) throw new Error("Failed to fetch top companies")
+        const data = await response.json()
+        setTopCompanies(data)
+      } catch (error) {
+        console.error("Error fetching top companies:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTopCompanies()
+  }, [])
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/jobs?keyword=${encodeURIComponent(searchQuery)}`)
+    }
+  }
+
+  // Render star rating
+  const renderStarRating = (rating: number) => {
+    return (
+      <div className="flex items-center">
+        {[...Array(5)].map((_, i) => (
+          <Star
+            key={i}
+            className={`h-4 w-4 ${i < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+          />
+        ))}
+        <span className="ml-1.5 text-sm font-medium">{rating.toFixed(1)}</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-teal-500 to-blue-600 pt-24 pb-32 px-6 text-white overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/20"></div>
+          <div className="absolute top-1/2 -left-24 w-64 h-64 rounded-full bg-white/20"></div>
+          <div className="absolute bottom-0 right-1/3 w-48 h-48 rounded-full bg-white/20"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="md:w-1/2 space-y-6">
+              <Badge className="bg-white/20 text-white px-3 py-1 text-sm font-medium mb-2">
+                Find Your Dream Career
+              </Badge>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                Discover Top Companies & Exciting Jobs
+              </h1>
+              <p className="text-lg md:text-xl opacity-90 max-w-xl">
+                Join thousands of professionals who use CareerOnDoor to find great companies with authentic employee
+                reviews.
+              </p>
+
+              <form onSubmit={handleSearch} className="relative max-w-xl">
+                <div className="flex gap-2 bg-white/10 backdrop-blur-sm p-2 rounded-lg">
+                  <Input
+                    type="text"
+                    placeholder="Search jobs, skills, or companies..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-white/90 border-0 placeholder:text-gray-500 text-gray-900 rounded-md"
+                  />
+                  <Button
+                    type="submit"
+                    className="bg-white font-semibold p-3 text-teal-600 hover:bg-white/90 flex items-center gap-2 px-4"
+                  >
+                    <Search size={18} /> Search
+                  </Button>
+                </div>
+              </form>
+
+              <div className="flex flex-wrap gap-2 pt-2">
+                <span className="text-white/80">Popular:</span>
+                <Badge
+                  className="bg-white/20 hover:bg-white/30 text-white cursor-pointer"
+                  onClick={() => router.push("/jobs?keyword=react")}
+                >
+                  React
+                </Badge>
+                <Badge
+                  className="bg-white/20 hover:bg-white/30 text-white cursor-pointer"
+                  onClick={() => router.push("/jobs?keyword=node")}
+                >
+                  Node.js
+                </Badge>
+                <Badge
+                  className="bg-white/20 hover:bg-white/30 text-white cursor-pointer"
+                  onClick={() => router.push("/jobs?keyword=javascript")}
+                >
+                  JavaScript
+                </Badge>
+              </div>
+            </div>
+
+            <div className="md:w-1/2 flex justify-center">
+              <div className="relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-300 to-blue-300 rounded-lg blur opacity-50"></div>
+                <Image
+                  src="https://firebasestorage.googleapis.com/v0/b/real-estate-315ad.appspot.com/o/CareerOnDoor.webp?alt=media"
+                  alt="Career illustration"
+                  width={500}
+                  height={400}
+                  unoptimized={true}
+                  className="relative rounded-lg shadow-2xl border border-white/20"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Wave divider */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 overflow-hidden">
+          <svg
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+            className="absolute bottom-0 w-full h-full text-white fill-current"
+          >
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C0,0,0,0,0,0z"></path>
+          </svg>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      
+      {/* Job Categories Showcase */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-12">
+          <Badge className="bg-blue-100 text-blue-700 mb-3">Explore Opportunities</Badge>
+          <h2 className="text-3xl font-bold text-gray-900">Find Jobs in Top Categories</h2>
+          <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+            Browse thousands of job opportunities across various industries and skill levels
+          </p>
+        </div>
+
+        <div className="w-full">
+      {/* Mobile: Swiper Carousel (1 card at a time) */}
+      <div className="block md:hidden">
+        <Swiper
+          modules={[Pagination]}
+          spaceBetween={10}
+          slidesPerView={1} // Only 1 card visible at a time
+          pagination={{ clickable: true }} // Shows dots below the slider
+          loop
+          className="w-full"
+        >
+          {jobCategories.map((category, index) => (
+            <SwiperSlide key={index} className="flex justify-center">
+              <Card className="bg-white border-0 shadow-lg hover:shadow-xl mx-auto transition-shadow overflow-hidden group w-[90%]">
+                <CardContent className="p-0">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        {category.icon}
+                        <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {category.tags.map((tag, i) => (
+                        <Badge key={i} variant="outline" className="bg-gray-50">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100">
+                    <Link
+                      href={`/jobs?category=${category.name.toLowerCase()}`}
+                      className="flex items-center justify-between text-teal-600 font-medium group-hover:text-teal-700 transition-colors"
+                    >
+                      <span>Browse {category.name} Jobs</span>
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+
+      {/* Desktop: Grid Layout */}
+      <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8">
+        {jobCategories.map((category, index) => (
+          <Card key={index} className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow overflow-hidden group">
+            <CardContent className="p-0">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    {category.icon}
+                    <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {category.tags.map((tag, i) => (
+                    <Badge key={i} variant="outline" className="bg-gray-50">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100">
+                <Link
+                  href={`/jobs?category=${category.name.toLowerCase()}`}
+                  className="flex items-center justify-between text-teal-600 font-medium group-hover:text-teal-700 transition-colors"
+                >
+                  <span>Browse {category.name} Jobs</span>
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+
+        <div className="text-center mt-12">
+          <Button className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white px-6 py-2 rounded-full">
+            <Link href="/jobs">View All Job Categories</Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* Top Companies Section */}
+      <div className="bg-gradient-to-b from-gray-50 to-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-12">
+            <div>
+              <Badge className="bg-teal-100 text-teal-700 mb-3">Top Rated</Badge>
+              <h2 className="text-3xl font-bold text-gray-900">Highest Rated Companies</h2>
+              <p className="text-gray-600 mt-2">Discover the best companies to work for based on employee reviews</p>
+            </div>
+            <Link
+              href="/companies"
+              className="mt-4 md:mt-0 text-teal-600 font-medium flex items-center hover:text-teal-700 transition-colors"
+            >
+              View all companies <ChevronRight className="h-4 w-4 ml-1" />
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, index) => (
+                <Card key={index} className="bg-white border border-gray-100 shadow-md animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                      <div className="ml-4 space-y-2">
+                        <div className="h-5 bg-gray-200 rounded w-24"></div>
+                        <div className="h-4 bg-gray-200 rounded w-32"></div>
+                      </div>
+                    </div>
+                    <div className="h-4 bg-gray-200 rounded w-full mt-4"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="w-full">
+      {/* Mobile: Swiper Carousel (1 card at a time) */}
+      <div className="block sm:hidden">
+        <Swiper
+          modules={[Pagination]}
+          spaceBetween={10}
+          slidesPerView={1} // Show 1 card at a time
+          pagination={{ clickable: true }} // Show dots for navigation
+          loop
+          className="w-full"
+        >
+          {topCompanies.map((company) => (
+            <SwiperSlide key={company._id} className="flex justify-center">
+              <Card className="bg-white border border-gray-200 mx-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 rounded-xl overflow-hidden w-full max-w-xs cursor-pointer">
+                <CardContent className="p-6">
+                  {/* Company Logo / Initial */}
+                  <div className="flex items-center mb-4">
+                    <div className="relative">
+                      <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-xl font-bold text-teal-600">
+                        {company.name.charAt(0).toUpperCase()}
+                      </div>
+                      {company.verified && (
+                        <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1">
+                          <CheckCircle className="h-4 w-4 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="font-semibold text-gray-900 text-lg group-hover:text-teal-600 transition-colors">
+                        {company.name}
+                      </h3>
+                      <div className="flex items-center text-yellow-500">
+                        {renderStarRating(company.avgRating)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Reviews & Engagement */}
+                  <div className="flex items-center justify-between text-gray-600 text-sm mt-4">
+                    <div className="flex items-center">
+                      <Users className="h-5 w-5 mr-1.5 text-gray-500" />
+                      <span className="font-medium">
+                        {company.TotalReviews} {company.TotalReviews === 1 ? "Review" : "Reviews"}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+
+      {/* Desktop: Grid Layout */}
+      <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {topCompanies.map((company) => (
+          <div key={company._id} className="flex justify-center">
+            <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 rounded-xl overflow-hidden w-full max-w-xs cursor-pointer">
+              <CardContent className="p-6">
+                {/* Company Logo / Initial */}
+                <div className="flex items-center mb-4">
+                  <div className="relative">
+                    <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-xl font-bold text-teal-600">
+                      {company.name.charAt(0).toUpperCase()}
+                    </div>
+                    {company.verified && (
+                      <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1">
+                        <CheckCircle className="h-4 w-4 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="font-semibold text-gray-900 text-lg group-hover:text-teal-600 transition-colors">
+                      {company.name}
+                    </h3>
+                    <div className="flex items-center text-yellow-500">
+                      {renderStarRating(company.avgRating)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reviews & Engagement */}
+                <div className="flex items-center justify-between text-gray-600 text-sm mt-4">
+                  <div className="flex items-center">
+                    <Users className="h-5 w-5 mr-1.5 text-gray-500" />
+                    <span className="font-medium">
+                      {company.TotalReviews} {company.TotalReviews === 1 ? "Review" : "Reviews"}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ))}
+      </div>
+    </div>
+            
+          )}
+        </div>
+      </div>
+
+      {/* Feature Section */}
+      
+<div className="bg-gradient-to-r from-teal-500 to-blue-600 py-20 text-white">
+  <div className="max-w-6xl mx-auto px-6">
+    <div className="text-center mb-12">
+      <p className="text-white/50 uppercase tracking-wider">Why CareerOnDoor?</p>
+      <h2 className="text-4xl font-extrabold leading-tight">
+        Your Career. Our Priority. <span className="text-yellow-300">No Limits.</span>
+      </h2>
+      <p className="text-white/80 mt-3 max-w-3xl mx-auto">
+        Get access to powerful job tools, real company insights, and a seamless application process.
+      </p>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {highlights.map((item) => (
+        <div
+          key={item.id}
+          className={`rounded-xl p-6 text-center shadow-lg bg-gradient-to-r ${item.gradient} transition-transform transform hover:scale-105`}
+        >
+          <span className="text-5xl">{item.icon}</span>
+          <h3 className="text-xl font-semibold mt-4">{item.title}</h3>
+          <p className="text-white/90 mt-2">{item.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+      {/* CTA Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+        <div className="max-w-3xl mx-auto">
+          <Badge className="bg-blue-100 text-blue-700 mb-3">Get Started Today</Badge>
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Find Your Dream Job?</h2>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-10">
+            Join thousands of professionals who have found their perfect career match on CareerOnDoor. Create your
+            account today and start exploring.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all">
+              <Link href="/signup" className="flex items-center">
+                Create Free Account <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="border-2 border-teal-500 text-teal-600 hover:bg-teal-50 px-8 py-6 text-lg rounded-xl"
+            >
+              <Link href="/jobs">Browse Jobs</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
