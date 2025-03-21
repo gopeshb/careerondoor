@@ -12,7 +12,6 @@ import { ArrowLeft, Lock, Mail } from 'lucide-react';
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // 🔹 Loading spinner component
 function LoadingSpinner() {
@@ -20,6 +19,7 @@ function LoadingSpinner() {
 }
 
 export default function SignInPage() {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const router = useRouter();

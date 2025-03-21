@@ -10,7 +10,6 @@ import toast, { Toaster } from "react-hot-toast"
 import { ArrowLeft, CheckCircle } from "lucide-react"
 import Link from "next/link"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // 🔹 Public image URLs for avatars
 const avatarOptions = [
@@ -28,6 +27,7 @@ function LoadingSpinner() {
 }
 
 export default function SignUpPage() {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",

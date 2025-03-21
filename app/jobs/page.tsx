@@ -49,9 +49,9 @@ interface SearchParams {
   page: number
 }
 
-const BASE_API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs`
 
 export default function Jobs() {
+  const BASE_API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs`
   const router = useRouter()
   const searchParams = useSearchParams()
   

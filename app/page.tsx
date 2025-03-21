@@ -34,7 +34,6 @@ interface Company {
   TotalReviews: number
   verified: boolean
 }
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // Testimonials data
 const highlights = [
@@ -87,7 +86,8 @@ export default function HomePage() {
   const [topCompanies, setTopCompanies] = useState<Company[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  
   // Fetch top companies from API
   useEffect(() => {
     const fetchTopCompanies = async () => {

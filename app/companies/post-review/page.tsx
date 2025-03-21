@@ -40,8 +40,8 @@ interface Review {
   companyName?: string
   companyWebsite?: string
 }
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 export default function ReviewForm() {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const [searchTerm, setSearchTerm] = useState("")
   const [companies, setCompanies] = useState<Company[]>([])
   const [loading, setLoading] = useState(false)

@@ -9,7 +9,6 @@ import { toast, Toaster } from "react-hot-toast"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 interface Company {
   _id: string
@@ -22,6 +21,7 @@ interface Company {
 }
 
 export default function CompaniesPage() {
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const [companies, setCompanies] = useState<Company[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")

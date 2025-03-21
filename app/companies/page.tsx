@@ -36,9 +36,9 @@ interface CompanyCategory {
   description: string
 }
 
-const BASE_API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/companies`
 
 export default function Companies() {
+  const BASE_API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/companies`
   const [search, setSearch] = useState<string>("")
   const [activeTab, setActiveTab] = useState<string>("rating")
   const [searchResults, setSearchResults] = useState<Company[]>([])
