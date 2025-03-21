@@ -9,6 +9,8 @@ import { toast, Toaster } from "react-hot-toast"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 interface Company {
   _id: string
   name: string
@@ -31,7 +33,7 @@ export default function CompaniesPage() {
     try {
       // We'll fetch all companies and filter on the client side
       // In a real app, you'd want to add a server endpoint to filter by verified status
-      const response = await fetch("http://localhost:5000/api/companies/verify")
+      const response = await fetch(`${BASE_URL}/api/companies/verify`)
       if (!response.ok) throw new Error("Failed to fetch companies")
 
       const data = await response.json()
@@ -54,7 +56,7 @@ export default function CompaniesPage() {
   const verifyCompany = useCallback(async (companyId: string) => {
     setProcessingCompany(companyId);
     try {
-      const response = await fetch(`http://localhost:5000/api/companies/verify/${companyId}`, {
+      const response = await fetch(`${BASE_URL}/api/companies/verify/${companyId}`, {
         method: "PUT", // Ensure it matches the backend
         headers: {
           "Content-Type": "application/json",
@@ -84,7 +86,7 @@ export default function CompaniesPage() {
 
     setProcessingCompany(companyId)
     try {
-      const response = await fetch(`http://localhost:5000/api/companies/${companyId}`, {
+      const response = await fetch(`${BASE_URL}/api/companies/${companyId}`, {
         method: "DELETE",
         credentials: "include",
       })

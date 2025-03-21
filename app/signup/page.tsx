@@ -10,6 +10,8 @@ import toast, { Toaster } from "react-hot-toast"
 import { ArrowLeft, CheckCircle } from "lucide-react"
 import Link from "next/link"
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 // 🔹 Public image URLs for avatars
 const avatarOptions = [
   "https://firebasestorage.googleapis.com/v0/b/real-estate-315ad.appspot.com/o/avatar1.png?alt=media&token=6eb17688-bfa5-472c-8356-65c3e5296a44",
@@ -57,7 +59,7 @@ export default function SignUpPage() {
     setLoading(true)
 
     try {
-      const response = await fetch("http://localhost:5000/auth/register", {
+      const response = await fetch(`${BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

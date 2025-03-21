@@ -14,6 +14,9 @@ import { Toaster, toast } from "react-hot-toast"
 import { Loader2, Briefcase, Building2, MapPin, Calendar, DollarSign, Link2, FileText, Plus, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 interface Company {
   _id: string
   name: string
@@ -133,7 +136,7 @@ export default function CreateJobPage() {
     setLoadingCompanies(true)
     try {
       // In a real app, you'd want to filter for verified companies only
-      const res = await fetch("http://localhost:5000/api/companies/all")
+      const res = await fetch(`${BASE_URL}/api/companies/all`)
       if (!res.ok) throw new Error("Failed to fetch companies")
       const data = await res.json()
       setCompanies(data)
@@ -218,7 +221,7 @@ export default function CreateJobPage() {
       setLoading(true);
   
       try {
-        const response = await fetch("http://localhost:5000/api/jobs", {
+        const response = await fetch(`${BASE_URL}/api/jobs`, {
           method: "POST", // or "PUT" if updating
           headers: {
             "Content-Type": "application/json",

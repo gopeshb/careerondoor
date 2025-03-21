@@ -12,6 +12,8 @@ import { ArrowLeft, Lock, Mail } from 'lucide-react';
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 // 🔹 Loading spinner component
 function LoadingSpinner() {
   return <div className="w-5 h-5 border-4 border-t-teal-500 border-white/30 rounded-full animate-spin mx-auto"></div>;
@@ -39,7 +41,7 @@ export default function SignInPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/auth/login", {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

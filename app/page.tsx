@@ -34,6 +34,7 @@ interface Company {
   TotalReviews: number
   verified: boolean
 }
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // Testimonials data
 const highlights = [
@@ -91,7 +92,8 @@ export default function HomePage() {
   useEffect(() => {
     const fetchTopCompanies = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/companies/top/rating")
+        console.log(BASE_URL);
+        const response = await fetch(`${BASE_URL}/api/companies/top/rating`)
         if (!response.ok) throw new Error("Failed to fetch top companies")
         const data = await response.json()
         setTopCompanies(data)

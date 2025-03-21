@@ -10,6 +10,8 @@ import { ArrowLeft, Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2, XCircl
 import toast, { Toaster } from "react-hot-toast"
 import Link from "next/link"
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export default function ResetPasswordPage() {
   const [formData, setFormData] = useState({
     password: "",
@@ -37,7 +39,7 @@ export default function ResetPasswordPage() {
       }
 
       try {
-        const response = await fetch("http://localhost:5000/auth/validate-reset-token", {
+        const response = await fetch(`${BASE_URL}/auth/validate-reset-token`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token, email }),
@@ -105,7 +107,7 @@ export default function ResetPasswordPage() {
     setLoading(true)
 
     try {
-      const response = await fetch("http://localhost:5000/auth/reset-password", {
+      const response = await fetch(`${BASE_URL}/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, email, password }),

@@ -49,7 +49,7 @@ interface SearchParams {
   page: number
 }
 
-const BASE_API_URL = "http://localhost:5000/api/jobs"
+const BASE_API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs`
 
 export default function Jobs() {
   const router = useRouter()

@@ -36,7 +36,7 @@ interface CompanyCategory {
   description: string
 }
 
-const BASE_API_URL = "http://localhost:5000/api/companies"
+const BASE_API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/companies`
 
 export default function Companies() {
   const [search, setSearch] = useState<string>("")

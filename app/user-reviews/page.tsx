@@ -19,6 +19,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import type { RootState } from "@/redux/store"
 import { toast } from "react-hot-toast"
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 interface Review {
   _id: string
   companyId: {
@@ -55,7 +58,7 @@ export default function UserReviews() {
           return;
         }
   
-        const response = await fetch(`http://localhost:5000/api/reviews?userId=${user.id}`, {
+        const response = await fetch(`${BASE_URL}/api/reviews?userId=${user.id}`, {
           credentials: "include", // Ensures authentication tokens are included
         });
   
@@ -102,7 +105,7 @@ export default function UserReviews() {
     try {
       console.log("Deleting review with ID:", deleteReviewId);
   
-      const response = await fetch(`http://localhost:5000/api/reviews/${deleteReviewId}`, {
+      const response = await fetch(`${BASE_URL}/api/reviews/${deleteReviewId}`, {
         method: "DELETE",
         credentials: "include",
       });

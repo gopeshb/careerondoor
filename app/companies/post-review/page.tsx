@@ -40,7 +40,7 @@ interface Review {
   companyName?: string
   companyWebsite?: string
 }
-
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 export default function ReviewForm() {
   const [searchTerm, setSearchTerm] = useState("")
   const [companies, setCompanies] = useState<Company[]>([])
@@ -64,7 +64,7 @@ export default function ReviewForm() {
     const fetchCompanies = async () => {
       setLoading(true)
       try {
-        const res = await fetch(`http://localhost:5000/api/companies?search=${searchTerm}`)
+        const res = await fetch(`${BASE_URL}/api/companies?search=${searchTerm}`)
         if (!res.ok) throw new Error("Failed to fetch")
         const data = await res.json()
         setCompanies([...data, { _id: "others", name: "Others" }])
@@ -129,7 +129,7 @@ export default function ReviewForm() {
 
     setSubmitting(true)
     try {
-      const res = await fetch("http://localhost:5000/api/reviews", {
+      const res = await fetch(`${BASE_URL}/api/reviews`, {
         method: "POST",
         credentials: "include", // Ensure cookies are sent
         headers: { "Content-Type": "application/json" },

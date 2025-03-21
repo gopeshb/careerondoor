@@ -13,6 +13,8 @@ import { Toaster, toast } from "react-hot-toast"
 import { ArrowLeft, Star, StarHalf, Briefcase, Shield, DollarSign, Building2, Loader2 } from "lucide-react"
 import Link from "next/link"
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 interface Review {
   _id: string
   companyId: {
@@ -44,7 +46,7 @@ export default function EditReviewPage({ params }: { params:Promise<Params> }) {
     const fetchReview = async () => {
       setLoading(true)
       try {
-        const response = await fetch(`http://localhost:5000/api/reviews/${id}`, {
+        const response = await fetch(`${BASE_URL}/api/reviews/${id}`, {
           credentials: "include", // Include cookies for auth
         })
 
@@ -91,7 +93,7 @@ export default function EditReviewPage({ params }: { params:Promise<Params> }) {
     setSubmitting(true)
 
     try {
-      const response = await fetch(`http://localhost:5000/api/reviews/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/reviews/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

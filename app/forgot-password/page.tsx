@@ -10,6 +10,7 @@ import { ArrowLeft, Mail, AlertCircle, CheckCircle, Loader2 } from "lucide-react
 import toast, { Toaster } from "react-hot-toast"
 import Link from "next/link"
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
@@ -41,7 +42,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      const response = await fetch("http://localhost:5000/auth/forgot-password", {
+      const response = await fetch(`${BASE_URL}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
