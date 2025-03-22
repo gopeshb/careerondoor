@@ -1,6 +1,6 @@
 "use client"
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useState, useEffect, useCallback } from "react"
 import { useSelector } from "react-redux"
 import { Star, Building2, Shield, Banknote, ExternalLink, Edit, Trash2, AlertCircle } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -20,7 +20,7 @@ import {
 import type { RootState } from "@/redux/store"
 import { toast } from "react-hot-toast"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
 interface Review {
   _id: string
@@ -44,105 +44,118 @@ export default function UserReviews() {
   const [deleteReviewId, setDeleteReviewId] = useState<string | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-    const router = useRouter(); // Initialize Next.js router
+  const router = useRouter() // Initialize Next.js router
 
   const user = useSelector((state: RootState) => state.user.user)
-  
-  useEffect(() => {
-    const fetchReviews = async () => {
-      setLoading(true);
-      try {
-        if (!user?.id) {
-          setError("Unable to fetch reviews for this user.");
-          setLoading(false);
-          return;
-        }
-  
-        const response = await fetch(`${BASE_URL}/api/reviews?userId=${user.id}`, {
-          credentials: "include", // Ensures authentication tokens are included
-        });
-  
-        if (!response.ok) {
-          const errorData = await response.json(); // Parse error response
-          if (response.status === 401) {
-            toast.error("Session expired. Please log in again."); // Show toast notification
-            router.push("/signin"); // Redirect to sign-in page
-          } else {
-            setError(errorData.message || "Failed to fetch reviews.");
-            toast.error(errorData.message || "Error fetching reviews.");
-          }
-          return;
-        }
-  
-        const data = await response.json();
-        setReviews(data);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching reviews:", err);
-        setError("Something went wrong. Please try again later.");
-        toast.error("Something went wrong. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchReviews();
-  }, [user]);
-  
 
-  const handleDeleteClick = (reviewId: string) => {
+  const fetchReviews = useCallback(async () => {
+    setLoading(true)
+    try {
+      if (!user?.id) {
+        setError("User ID is required to fetch reviews.")
+        setLoading(false)
+        return
+      }
+
+      const response = await fetch(`${BASE_URL}/api/reviews?userId=${user.id}`, {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Failed to parse error response" }))
+
+        if (response.status === 401) {
+          toast.error("Session expired. Please log in again.")
+          router.push("/signin")
+        } else {
+          const errorMessage = errorData.message || `Error: ${response.status} ${response.statusText}`
+          setError(errorMessage)
+          toast.error(errorMessage)
+        }
+        return
+      }
+
+      const data = await response.json()
+      setReviews(Array.isArray(data) ? data : [])
+      setError(null)
+    } catch (err) {
+      console.error("Error fetching reviews:", err)
+      const errorMessage = err instanceof Error ? err.message : "Something went wrong. Please try again later."
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }, [user, router])
+
+  useEffect(() => {
+    fetchReviews()
+  }, [fetchReviews])
+
+  const handleDeleteClick = useCallback((reviewId: string) => {
     setDeleteReviewId(reviewId)
     setIsDeleteDialogOpen(true)
-  }
+  }, [])
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteReviewId) return
 
-  
-  const handleDeleteConfirm = async () => {
-    if (!deleteReviewId) return;
-    
-    setIsDeleting(true);
-    
+    setIsDeleting(true)
+
     try {
-      console.log("Deleting review with ID:", deleteReviewId);
-  
       const response = await fetch(`${BASE_URL}/api/reviews/${deleteReviewId}`, {
         method: "DELETE",
         credentials: "include",
-      });
-  
-      const data = await response.json(); // Parse JSON response
-  
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      let data
+      try {
+        data = await response.json()
+      } catch (e) {
+        data = { message: "Could not parse response" }
+      }
+
       if (!response.ok) {
         if (response.status === 401) {
-          toast.error(data.message || "Unauthorized! Please sign in.");
-          router.push("/signin"); // Redirect to sign-in page
-          return;
+          toast.error(data.message || "Unauthorized! Please sign in.")
+          router.push("/signin")
+          return
         }
-        toast.error(data.message || "Failed to delete review."); // Show backend message
-        return;
+        toast.error(data.message || `Failed to delete review (${response.status})`)
+        return
       }
-  
+
       // Remove the deleted review from state
-      setReviews((prevReviews) => prevReviews.filter((review) => review._id !== deleteReviewId));
-  
-      toast.success("Review deleted successfully!"); // ✅ Show success toast
+      setReviews((prevReviews) => prevReviews.filter((review) => review._id !== deleteReviewId))
+      toast.success("Review deleted successfully!")
     } catch (err) {
-      console.error("Error deleting review:", err);
-      toast.error("Something went wrong!"); // ❌ Show generic error message
+      console.error("Error deleting review:", err)
+      const errorMessage = err instanceof Error ? err.message : "Something went wrong!"
+      toast.error(errorMessage)
     } finally {
-      setIsDeleting(false);
-      setIsDeleteDialogOpen(false);
-      setDeleteReviewId(null);
+      setIsDeleting(false)
+      setIsDeleteDialogOpen(false)
+      setDeleteReviewId(null)
     }
-  };
-  const renderRatingStars = (rating: number) => {
+  }, [deleteReviewId, router])
+  const renderRatingStars = useCallback((rating: number) => {
     return (
       <div className="flex">
-        {[...Array(5)].map((_, i) => (
+        {Array.from({ length: 5 }, (_, i) => (
           <Star key={i} className={`w-4 h-4 ${i < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
         ))}
       </div>
     )
+  }, [])
+
+  const navigateTo = (path: string) => () => {
+    router.push(path)
   }
 
   return (
@@ -158,9 +171,10 @@ export default function UserReviews() {
           <div className="flex justify-center">
             <Button
               className="bg-white text-teal-600 font-semibold hover:bg-white/90 px-6 py-3"
-              onClick={() => (window.location.href = "/companies")}
+              onClick={navigateTo("/companies")}
+              disabled={loading}
             >
-              Explore Companies
+              {loading ? "Loading..." : "Explore Companies"}
             </Button>
           </div>
         </div>
@@ -182,9 +196,7 @@ export default function UserReviews() {
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Your Submitted Reviews</h2>
           <p className="text-gray-600 mt-2">
-            {user
-              ? "All the company reviews you've shared with the community"
-              : `Reviews submitted by`}
+            {user ? "All the company reviews you've shared with the community" : `Reviews submitted by`}
           </p>
         </div>
 
@@ -227,7 +239,7 @@ export default function UserReviews() {
             </p>
             <Button
               className="bg-gradient-to-r from-teal-500 to-blue-500 text-white"
-              onClick={() => (window.location.href = "/companies/post-review")}
+              onClick={navigateTo("/companies/post-review")}
             >
               Write Your First Review
             </Button>
@@ -271,7 +283,6 @@ export default function UserReviews() {
                         <div className="mr-2">{renderRatingStars(review.rating)}</div>
                         <span className="text-sm font-medium text-gray-700">Overall Rating</span>
                       </div>
-                      
                     </div>
 
                     <div className="space-y-3 text-sm">
@@ -312,7 +323,7 @@ export default function UserReviews() {
                           variant="outline"
                           size="sm"
                           className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                          onClick={() => (window.location.href = `/user-reviews/${review._id}`)}
+                          onClick={navigateTo(`/user-reviews/${review._id}`)}
                         >
                           <Edit className="h-3.5 w-3.5 mr-1" /> Edit
                         </Button>
