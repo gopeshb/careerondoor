@@ -8,7 +8,7 @@ import { useSelector } from "react-redux"
 import { logout } from "@/redux/userSlice"
 import { useDispatch } from "react-redux"
 import Link from "next/link"
-import { Menu, X, LogIn, Building, Briefcase, ChevronDown } from "lucide-react"
+import { Menu, X, LogIn, Building, Briefcase, ChevronDown, GraduationCap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -91,6 +91,10 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-1">
+          <NavLink href="/internships" onClick={handleNavigation}>
+              <GraduationCap className="w-4 h-4 mr-1.5" />
+              Internships
+            </NavLink>
             <NavLink href="/jobs" onClick={handleNavigation}>
               <Briefcase className="w-4 h-4 mr-1.5" />
               Jobs
@@ -171,6 +175,10 @@ export default function Navbar() {
         )}
       >
         <div className="px-4 py-3 space-y-3">
+        <MobileNavLink href="/internships" onClick={handleNavigation}>
+            <GraduationCap className="w-5 h-5 mr-3 text-teal-500" />
+            Internships
+          </MobileNavLink>
           <MobileNavLink href="/jobs" onClick={handleNavigation}>
             <Briefcase className="w-5 h-5 mr-3 text-teal-500" />
             Jobs

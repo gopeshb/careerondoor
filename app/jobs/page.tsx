@@ -130,7 +130,7 @@ export default function Jobs() {
     }
     
     const newUrl = `/jobs${params.toString() ? `?${params.toString()}` : ""}`
-    router.push(newUrl, { scroll: false })
+    router.replace(newUrl, { scroll: false });
   }
 
   // Handle search form submission
@@ -342,7 +342,7 @@ export default function Jobs() {
               </div>
               
               <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div className="flex sm:flex-row gap-3 text-sm">
+                <div className="flex sm:flex-row gap-1 md:gap-3 text-sm">
                 <div className="flex items-center gap-1">
                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                 Environment: {job.companyId.workEnv}/5
