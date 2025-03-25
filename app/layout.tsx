@@ -27,8 +27,6 @@ export default function RootLayout({
       
       <meta name="google-adsense-account" content="ca-pub-9075132581085185">
       </meta>
-      <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9075132581085185"
-   crossOrigin="anonymous"></Script>
       </head>
       <body data-new-gr-c-s-check-loaded="14.1096.0"
                          data-gr-ext-installed="">
