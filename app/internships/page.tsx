@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -17,7 +15,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Search, Briefcase, MapPin, Building2, Star } from "lucide-react"
+import { Search, Briefcase, MapPin, Building2, Star, Clock, CalendarClock } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
 
 // Define interfaces based on the actual API response
@@ -39,23 +38,25 @@ interface Internship {
   skills_required: string[]
   companyId: Company
   stipend: string
+  duration: number // Duration in months
   applylink: string
-  last_date?: string
 }
 
 interface SearchParams {
   keyword: string
+  duration: string
   page: number
 }
 
 export default function Internships() {
-  const BASE_API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/internships`
+  const BASE_API_URL = process.env.NEXT_PUBLIC_BASE_URL
   const router = useRouter()
   const searchParams = useSearchParams()
 
   // State for search and filters
   const [searchParams_, setSearchParams] = useState<SearchParams>({
     keyword: searchParams?.get("keyword") || "",
+    duration: searchParams?.get("duration") || "",
     page: Number(searchParams?.get("page")) || 1,
   })
 
@@ -66,8 +67,19 @@ export default function Internships() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Duration options for filter
+  const durationOptions = [
+    { value: "all", label: "All Durations" },
+    { value: "1", label: "1 Month" },
+    { value: "2", label: "2 Months" },
+    { value: "3", label: "3 Months" },
+    { value: "4", label: "4 Months" },
+    { value: "5", label: "5 Months" },
+    { value: "6", label: "6 Months" },
+  ]
+
   // Fetch internships based on search params
-  const fetchInternships = async () => {
+  const fetchInternships = useCallback(async () => {
     setLoading(true)
     setError(null)
 
@@ -78,10 +90,14 @@ export default function Internships() {
         queryParams.append("keyword", searchParams_.keyword)
       }
 
+      if (searchParams_.duration) {
+        queryParams.append("duration", searchParams_.duration)
+      }
+
       queryParams.append("page", searchParams_.page.toString())
       queryParams.append("limit", "10") // 10 internships per page
 
-      const response = await fetch(`${BASE_API_URL}?${queryParams.toString()}`)
+      const response = await fetch(`${BASE_API_URL}/api/internships?${queryParams.toString()}`)
 
       if (!response.ok) {
         throw new Error("Failed to fetch internships")
@@ -97,14 +113,18 @@ export default function Internships() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [BASE_API_URL, searchParams_])
 
   // Update URL with search params
-  const updateUrl = () => {
+  const updateUrl = useCallback(() => {
     const params = new URLSearchParams()
 
     if (searchParams_.keyword) {
       params.append("keyword", searchParams_.keyword)
+    }
+
+    if (searchParams_.duration) {
+      params.append("duration", searchParams_.duration)
     }
 
     if (searchParams_.page > 1) {
@@ -113,12 +133,17 @@ export default function Internships() {
 
     const newUrl = `/internships${params.toString() ? `?${params.toString()}` : ""}`
     router.replace(newUrl, { scroll: false })
-  }
+  }, [router, searchParams_])
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     setSearchParams((prev) => ({ ...prev, page: 1 })) // Reset to page 1 on new search
+  }
+
+  // Handle duration filter change
+  const handleDurationChange = (value: string) => {
+    setSearchParams((prev) => ({ ...prev, duration: value, page: 1 }))
   }
 
   // Handle pagination
@@ -129,12 +154,12 @@ export default function Internships() {
   // Update URL when search params change
   useEffect(() => {
     updateUrl()
-  }, [searchParams_])
+  }, [searchParams_, updateUrl])
 
   // Fetch internships when URL params change
   useEffect(() => {
     fetchInternships()
-  }, [searchParams_])
+  }, [searchParams_, fetchInternships])
 
   // Render star rating
   const renderStarRating = (rating: number) => {
@@ -149,6 +174,11 @@ export default function Internships() {
         <span className="ml-1 text-xs text-gray-600">({rating.toFixed(1)})</span>
       </div>
     )
+  }
+
+  // Format duration text
+  const formatDuration = (months: number) => {
+    return `${months} ${months === 1 ? 'Month' : 'Months'}`
   }
 
   return (
@@ -170,6 +200,19 @@ export default function Internships() {
                 onChange={(e) => setSearchParams((prev) => ({ ...prev, keyword: e.target.value }))}
                 className="w-full bg-white/90 border-0 placeholder:text-gray-500 text-gray-900 rounded-md"
               />
+
+              <Select value={searchParams_.duration} onValueChange={handleDurationChange}>
+                <SelectTrigger className="w-full md:w-[180px] bg-white/90 border-0 text-gray-900">
+                  <SelectValue placeholder="Duration" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-50">
+                  {durationOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               <Button
                 type="submit"
@@ -202,6 +245,7 @@ export default function Internships() {
               <p className="text-gray-600 mt-1">
                 {totalInternships} {totalInternships === 1 ? "internship" : "internships"} found
                 {searchParams_.keyword && ` matching "${searchParams_.keyword}"`}
+                {searchParams_.duration && ` for ${durationOptions.find(o => o.value === searchParams_.duration)?.label.toLowerCase()}`}
               </p>
             )}
           </div>
@@ -238,7 +282,7 @@ export default function Internships() {
             <p className="text-gray-400 mt-2">Try adjusting your search filters</p>
             <Button
               className="mt-4 bg-teal-500 hover:bg-teal-600"
-              onClick={() => setSearchParams({ keyword: "", page: 1 })}
+              onClick={() => setSearchParams({ keyword: "", duration: "", page: 1 })}
             >
               Clear filters
             </Button>
@@ -261,9 +305,13 @@ export default function Internships() {
                           {renderStarRating(internship.companyId.avgRating)}
                         </div>
                       </div>
-                      <div className="mt-2 sm:mt-0">
-                        <Badge className="bg-teal-100 text-teal-800 md:text-sm hover:bg-teal-100">
+                      <div className="mt-2 sm:mt-0 flex flex-col sm:items-end gap-2">
+                        <Badge className="bg-purple-100 text-purple-800 md:text-sm hover:bg-purple-100">
                           Stipend: {internship.stipend}
+                        </Badge>
+                        <Badge className="bg-indigo-100 text-indigo-800 md:text-sm hover:bg-indigo-100">
+                          <Clock className="h-3.5 w-3.5 mr-1" />
+                          {formatDuration(internship.duration)}
                         </Badge>
                       </div>
                     </div>
@@ -287,29 +335,24 @@ export default function Internships() {
                         <MapPin className="h-4 w-4 mr-1" />
                         <span>{internship.location}</span>
                       </div>
+                     
                     </div>
 
                     <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                      <div className="flex sm:flex-row gap-1 md:gap-3 text-sm">
-                        <div className="flex items-center gap-1">
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                            Environment: {internship.companyId.workEnv}/5
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                            Salary: {internship.companyId.salary}/5
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                            Job Security: {internship.companyId.jobSec}/5
-                          </Badge>
-                        </div>
+                      <div className="flex flex-wrap sm:flex-row gap-1 md:gap-3 text-sm">
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          Environment: {internship.companyId.workEnv}/5
+                        </Badge>
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Salary: {internship.companyId.salary}/5
+                        </Badge>
+                        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                          Job Security: {internship.companyId.jobSec}/5
+                        </Badge>
                       </div>
 
                       <Link href={internship.applylink} target="_blank" rel="noopener noreferrer">
-                        <Button className="bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600">
+                        <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600">
                           Apply Now
                         </Button>
                       </Link>
@@ -379,4 +422,3 @@ export default function Internships() {
     </div>
   )
 }
-

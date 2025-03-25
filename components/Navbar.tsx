@@ -112,7 +112,10 @@ export default function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center space-x-2 rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
                     <Avatar className="h-9 w-9 border-2 border-teal-100 transition-all hover:border-teal-300">
-                      <AvatarImage src={user.avatar || undefined} alt={user.firstName || "User"} />
+                      <AvatarImage src={user.avatar || undefined} alt={user.firstName || "User"} 
+                        className="select-none pointer-events-none"
+                        draggable="false"
+                        onContextMenu={(e) => e.preventDefault()}/>
                       <AvatarFallback className="bg-gradient-to-r from-teal-500 to-blue-500 text-white">
                         {getUserInitials()}
                       </AvatarFallback>

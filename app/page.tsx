@@ -206,7 +206,7 @@ export default function HomePage() {
                 <div className="flex gap-2 bg-white/10 backdrop-blur-sm p-2 rounded-lg">
                   <Input
                     type="text"
-                    placeholder="Search jobs, internships, skills, or companies..."
+                    placeholder="Search jobs, skills, or companies..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-white/90 border-0 placeholder:text-gray-500 text-gray-900 rounded-md"
@@ -293,37 +293,36 @@ export default function HomePage() {
             <Swiper {...swiperSettings} className="w-full">
               {jobCategories.map((category, index) => (
                 <SwiperSlide key={index} className="flex justify-center">
-                  <Card className="bg-white border-0 shadow-lg hover:shadow-xl mx-auto transition-shadow overflow-hidden group w-[90%]">
-                    <CardContent className="p-0">
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            {category.icon}
-                            <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
-                          </div>
-                          
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {category.tags.map((tag, i) => (
-                            <Badge key={i} variant="outline" className="bg-gray-50">
-                              {tag}
-                            </Badge>
-                          ))}
+                    <Card className="bg-white border-0 shadow-lg hover:shadow-xl mx-auto transition-shadow overflow-hidden group w-full max-w-xs">
+                    <CardContent className="p-0 flex flex-col h-full">
+                      <div className="p-6 flex-grow">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                        {category.icon}
+                        <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
                         </div>
                       </div>
 
-                      <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100">
-                        <Link
-                          href={category.link}
-                          className="flex items-center justify-between text-teal-600 font-medium group-hover:text-teal-700 transition-colors"
-                        >
-                          <span>Browse {category.name} Jobs</span>
-                          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {category.tags.map((tag, i) => (
+                        <Badge key={i} variant="outline" className="bg-gray-50">
+                          {tag}
+                        </Badge>
+                        ))}
+                      </div>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100 mt-auto">
+                      <Link
+                        href={category.link}
+                        className="flex items-center justify-between text-teal-600 font-medium group-hover:text-teal-700 transition-colors"
+                      >
+                        <span>Browse {category.name} Jobs</span>
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </Link>
                       </div>
                     </CardContent>
-                  </Card>
+                    </Card>
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -332,40 +331,39 @@ export default function HomePage() {
           {/* Desktop: Grid Layout */}
           <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8">
             {jobCategories.map((category, index) => (
-              <Card
+                <Card
                 key={index}
-                className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow overflow-hidden group"
-              >
-                <CardContent className="p-0">
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        {category.icon}
-                        <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
-                      </div>
-                     
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {category.tags.map((tag, i) => (
-                        <Badge key={i} variant="outline" className="bg-gray-50">
-                          {tag}
-                        </Badge>
-                      ))}
+                className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow overflow-hidden group h-full flex flex-col"
+                >
+                <CardContent className="p-0 flex flex-col flex-grow">
+                  <div className="p-6 flex-grow">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                    {category.icon}
+                    <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100">
-                    <Link
-                      href={category.link}
-                      className="flex items-center justify-between text-teal-600 font-medium group-hover:text-teal-700 transition-colors"
-                    >
-                      <span>Browse {category.name} Jobs</span>
-                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Link>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {category.tags.map((tag, i) => (
+                    <Badge key={i} variant="outline" className="bg-gray-50">
+                      {tag}
+                    </Badge>
+                    ))}
+                  </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100 mt-auto">
+                  <Link
+                    href={category.link}
+                    className="flex items-center justify-between text-teal-600 font-medium group-hover:text-teal-700 transition-colors"
+                  >
+                    <span>Browse {category.name} Jobs</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
                   </div>
                 </CardContent>
-              </Card>
+                </Card>
             ))}
           </div>
         </div>
@@ -388,88 +386,86 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="w-full">
+            <div className="w-full">
             {/* Mobile: Swiper Carousel (1 card at a time) */}
             <div className="block md:hidden">
               <Swiper {...swiperSettings} className="w-full">
-                {internshipCategories.map((category, index) => (
-                  <SwiperSlide key={index} className="flex justify-center">
-                    <Card className="bg-white border-0 shadow-lg hover:shadow-xl mx-auto transition-shadow overflow-hidden group w-[90%]">
-                      <CardContent className="p-0">
-                        <div className="p-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              {category.icon}
-                              <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
-                            </div>
-                            
-                          </div>
+              {internshipCategories.map((category, index) => (
+              <SwiperSlide key={index} className="flex justify-center">
+              <Card className="bg-white border-0 shadow-lg hover:shadow-xl mx-auto transition-shadow overflow-hidden group w-full max-w-xs">
+                <CardContent className="p-0 flex flex-col h-full">
+                <div className="p-6 flex-grow">
+                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  {category.icon}
+                  <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
+                </div>
+                </div>
 
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {category.tags.map((tag, i) => (
-                              <Badge key={i} variant="outline" className="bg-gray-50">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100">
-                          <Link
-                            href={category.link}
-                            className="flex items-center justify-between text-purple-600 font-medium group-hover:text-purple-700 transition-colors"
-                          >
-                            <span>Browse {category.name} Internships</span>
-                            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                          </Link>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </SwiperSlide>
+                <div className="flex flex-wrap gap-2 mb-4">
+                {category.tags.map((tag, i) => (
+                  <Badge key={i} variant="outline" className="bg-gray-50">
+                  {tag}
+                  </Badge>
                 ))}
+                </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100 mt-auto">
+                <Link
+                href={category.link}
+                className="flex items-center justify-between text-purple-600 font-medium group-hover:text-purple-700 transition-colors"
+                >
+                <span>Browse {category.name} Internships</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                </div>
+                </CardContent>
+              </Card>
+              </SwiperSlide>
+              ))}
               </Swiper>
             </div>
 
             {/* Desktop: Grid Layout */}
             <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8">
               {internshipCategories.map((category, index) => (
-                <Card
-                  key={index}
-                  className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow overflow-hidden group"
+              <Card
+              key={index}
+              className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow overflow-hidden group h-full flex flex-col"
+              >
+              <CardContent className="p-0 flex flex-col flex-grow">
+              <div className="p-6 flex-grow">
+                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                {category.icon}
+                <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
+                </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                {category.tags.map((tag, i) => (
+                <Badge key={i} variant="outline" className="bg-gray-50">
+                {tag}
+                </Badge>
+                ))}
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100 mt-auto">
+                <Link
+                href={category.link}
+                className="flex items-center justify-between text-purple-600 font-medium group-hover:text-purple-700 transition-colors"
                 >
-                  <CardContent className="p-0">
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          {category.icon}
-                          <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
-                        </div>
-                       
-                      </div>
-
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {category.tags.map((tag, i) => (
-                          <Badge key={i} variant="outline" className="bg-gray-50">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-t border-gray-100">
-                      <Link
-                        href={category.link}
-                        className="flex items-center justify-between text-purple-600 font-medium group-hover:text-purple-700 transition-colors"
-                      >
-                        <span>Browse {category.name} Internships</span>
-                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
+                <span>Browse {category.name} Internships</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+              </CardContent>
+              </Card>
               ))}
             </div>
-          </div>
+            </div>
 
           <div className="text-center mt-12">
             <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-6 py-2 rounded-full">

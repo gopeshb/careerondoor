@@ -189,7 +189,13 @@ export default function SignUpPage() {
                       }`}
                       onClick={() => handleAvatarSelect(avatar)}
                     >
-                      <img src={avatar || "/placeholder.svg"} alt="Avatar" className="w-full h-auto rounded-full" />
+                      <img 
+  src={avatar || "/placeholder.svg"} 
+  alt="Avatar" 
+  className="w-full h-auto rounded-full" 
+  onContextMenu={(e) => e.preventDefault()} 
+/>
+
                       {formData.avatar === avatar && (
                         <div className="absolute -top-1 -right-1 bg-teal-500 rounded-full p-0.5">
                           <CheckCircle className="h-4 w-4 text-white" />
