@@ -307,7 +307,7 @@ export default function Jobs() {
                 </div>
                 <div className="mt-2 sm:mt-0">
                 <Badge className="bg-teal-100 text-teal-800 md:text-sm hover:bg-teal-100">
-                Expected Salary: {job.expected_salary}
+                Estimated Salary: {job.expected_salary}
                 </Badge>
                 </div>
               </div>

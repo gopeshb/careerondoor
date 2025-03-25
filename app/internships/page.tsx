@@ -307,7 +307,7 @@ export default function Internships() {
                       </div>
                       <div className="mt-2 sm:mt-0 flex flex-col sm:items-end gap-2">
                         <Badge className="bg-purple-100 text-purple-800 md:text-sm hover:bg-purple-100">
-                          Stipend: {internship.stipend}
+                          Estimated Stipend: {internship.stipend}
                         </Badge>
                         <Badge className="bg-indigo-100 text-indigo-800 md:text-sm hover:bg-indigo-100">
                           <Clock className="h-3.5 w-3.5 mr-1" />
