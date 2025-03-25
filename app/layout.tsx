@@ -27,6 +27,7 @@ export default function RootLayout({
       
       <meta name="google-adsense-account" content="ca-pub-9075132581085185">
       </meta>
+      <meta name="google-site-verification" content="KEEzMzycN6LOuzLZTQ6dPnuOKG5_xzDBWlB8DMmQhsU" />
       </head>
       <body data-new-gr-c-s-check-loaded="14.1096.0"
                          data-gr-ext-installed="">
