@@ -38,8 +38,14 @@ export default function RootLayout({
           <main>{children}</main>
           <Footer />
         </StoreProvider>
-      </body>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9075132581085185"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
         <GoogleAnalytics gaId="G-CLNL55WT89" />
+      </body>
     </html>
   );
 }
