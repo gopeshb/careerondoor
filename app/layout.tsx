@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import StoreProvider from "./StoreProvider";
 import { Toaster } from "react-hot-toast";
-
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 export const metadata: Metadata = {
   title: "CareerOnDoor - Your Gateway to Career Success",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "CareerOnDoor connects job seekers with top companies. Explore job opportunities, career advice, and hiring trends. Start your journey today!",
     keywords:
     "jobs, career, hiring, job search, career opportunities, recruitment, employment, CareerOnDoor",
-  authors: [{ name: "CareerOnDoor Team", url: "https://careerondoor.vercel.app" }],
+  authors: [{ name: "CareerOnDoor Team", url: "https://careerondoor.tech" }],
 };
 
 export default function RootLayout({
@@ -22,6 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+      <meta name="google-adsense-account" content="ca-pub-9075132581085185">
+      </meta>
+      </head>
       <body data-new-gr-c-s-check-loaded="14.1096.0"
                          data-gr-ext-installed="">
          <StoreProvider> 
@@ -31,6 +35,7 @@ export default function RootLayout({
           <Footer />
         </StoreProvider>
       </body>
+        <GoogleAnalytics gaId="G-CLNL55WT89" />
     </html>
   );
 }
