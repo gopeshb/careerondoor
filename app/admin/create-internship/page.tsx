@@ -511,10 +511,10 @@ export default function CreateInternshipPage() {
                   Duration
                 </Label>
                 <Select value={formData.duration} onValueChange={(value) => handleSelectChange("duration", value)}>
-                  <SelectTrigger id="duration">
+                  <SelectTrigger id="duration" >
                     <SelectValue placeholder="Select duration" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-gray-50">
                     {durationOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
