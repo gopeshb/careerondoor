@@ -187,7 +187,7 @@ export default function Internships() {
                 <SelectTrigger className="w-full md:w-[180px] bg-white/90 border-0 text-gray-900">
                   <SelectValue placeholder="Duration" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white/90">
                   {durationOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}

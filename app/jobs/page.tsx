@@ -183,7 +183,7 @@ export default function Jobs() {
                 <SelectTrigger className="w-full md:w-[180px] bg-white/90 border-0 text-gray-900">
                   <SelectValue placeholder="Experience" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white/90"> 
                   <SelectItem value="all">All Experience</SelectItem>
                   {experienceOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
