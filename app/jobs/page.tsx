@@ -34,12 +34,17 @@ interface Company {
 interface Job {
   _id: string
   role: string
-  experience: number
+  min_experience: number
+  max_experience?: number
   description: string
-  location: string
+  country: string
+  cities: string[]
+  remote: boolean
   skills_required: string[]
-  companyId: Company
-  expected_salary: string
+  company: Company
+  min_salary?: number
+  max_salary?: number
+  currency: string
   applylink: string
   last_date?: string
 }
@@ -47,6 +52,9 @@ interface Job {
 interface SearchParams {
   keyword: string
   experience: string
+  country: string
+  city: string
+  remote: string
   page: number
 }
 
@@ -59,6 +67,9 @@ export default function Jobs() {
   const [searchParams_, setSearchParams] = useState<SearchParams>({
     keyword: searchParams?.get("keyword") || "",
     experience: searchParams?.get("experience") || "",
+    country: searchParams?.get("country") || "",
+    city: searchParams?.get("city") || "",
+    remote: searchParams?.get("remote") || "",
     page: Number(searchParams?.get("page")) || 1,
   })
 
@@ -69,12 +80,36 @@ export default function Jobs() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
+  // State for location data
+  const [countries, setCountries] = useState<string[]>([])
+  const [cities, setCities] = useState<string[]>([])
+  const [loadingLocations, setLoadingLocations] = useState<boolean>(true)
+
   // Experience options
   const experienceOptions = [
-    { value: "fresher", label: "Fresher" },
+    { value: "fresher", label: "Fresher (0 years)" },
     { value: "0-2", label: "0-2 Years" },
-    { value: "2+", label: "2+ Years" },
+    { value: "2-5", label: "2-5 Years" },
+    { value: "5+", label: "5+ Years" },
   ]
+
+  // Fetch locations for filters
+  const fetchLocations = useCallback(async () => {
+    setLoadingLocations(true)
+    try {
+      const response = await fetch(`${BASE_API_URL}/api/jobs/locations`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch locations")
+      }
+      const data = await response.json()
+      setCountries(data.countries)
+      setCities(data.cities)
+    } catch (err) {
+      console.error("Error fetching locations:", err)
+    } finally {
+      setLoadingLocations(false)
+    }
+  }, [BASE_API_URL])
 
   // Fetch jobs based on search params
   const fetchJobs = useCallback(async () => {
@@ -92,6 +127,18 @@ export default function Jobs() {
         queryParams.append("experience", searchParams_.experience)
       }
 
+      if (searchParams_.country) {
+        queryParams.append("country", searchParams_.country)
+      }
+
+      if (searchParams_.city) {
+        queryParams.append("city", searchParams_.city)
+      }
+
+      if (searchParams_.remote === "true") {
+        queryParams.append("remote", "true")
+      }
+
       queryParams.append("page", searchParams_.page.toString())
       queryParams.append("limit", "10") // 10 jobs per page
 
@@ -104,7 +151,7 @@ export default function Jobs() {
       const data = await response.json()
       setJobs(data.jobs)
       setTotalJobs(data.totalJobs)
-      setTotalPages(Math.ceil(data.totalJobs / 10))
+      setTotalPages(data.totalPages)
     } catch (err) {
       setError((err as Error).message)
       setJobs([])
@@ -123,6 +170,18 @@ export default function Jobs() {
 
     if (searchParams_.experience) {
       params.append("experience", searchParams_.experience)
+    }
+
+    if (searchParams_.country) {
+      params.append("country", searchParams_.country)
+    }
+
+    if (searchParams_.city) {
+      params.append("city", searchParams_.city)
+    }
+
+    if (searchParams_.remote === "true") {
+      params.append("remote", "true")
     }
 
     if (searchParams_.page > 1) {
@@ -144,9 +203,37 @@ export default function Jobs() {
     setSearchParams((prev) => ({ ...prev, experience: value, page: 1 }))
   }
 
+  // Handle country filter change
+  const handleCountryChange = (value: string) => {
+    setSearchParams((prev) => ({ ...prev, country: value, city: "", page: 1 }))
+  }
+
+  // Handle city filter change
+  const handleCityChange = (value: string) => {
+    setSearchParams((prev) => ({ ...prev, city: value, page: 1 }))
+  }
+
+  // Handle remote filter change
+  const handleRemoteChange = (value: string) => {
+    setSearchParams((prev) => ({ ...prev, remote: value, page: 1 }))
+  }
+
   // Handle pagination
   const handlePageChange = (page: number) => {
     setSearchParams((prev) => ({ ...prev, page }))
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchParams({
+      keyword: "",
+      experience: "",
+      country: "",
+      city: "",
+      remote: "",
+      page: 1,
+    })
   }
 
   // Update URL when search params change
@@ -159,6 +246,11 @@ export default function Jobs() {
     fetchJobs()
   }, [searchParams_, fetchJobs])
 
+  // Fetch locations on component mount
+  useEffect(() => {
+    fetchLocations()
+  }, [fetchLocations])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
       {/* Hero Section */}
@@ -169,7 +261,7 @@ export default function Jobs() {
             Discover top job opportunities from leading companies and take the next step in your career.
           </p>
 
-          <form onSubmit={handleSearch} className="max-w-3xl mx-auto relative">
+          <form onSubmit={handleSearch} className="max-w-4xl mx-auto relative">
             <div className="flex flex-col md:flex-row gap-2 bg-white/10 backdrop-blur-sm p-2 rounded-lg">
               <Input
                 type="text"
@@ -183,7 +275,7 @@ export default function Jobs() {
                 <SelectTrigger className="w-full md:w-[180px] bg-white/90 border-0 text-gray-900">
                   <SelectValue placeholder="Experience" />
                 </SelectTrigger>
-                <SelectContent className="bg-white/90"> 
+                <SelectContent className="bg-white/90">
                   <SelectItem value="all">All Experience</SelectItem>
                   {experienceOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
@@ -224,9 +316,68 @@ export default function Jobs() {
               <p className="text-gray-600 mt-1">
                 {totalJobs} {totalJobs === 1 ? "job" : "jobs"} found
                 {searchParams_.keyword && ` matching "${searchParams_.keyword}"`}
-                {searchParams_.experience &&
-                  ` for ${experienceOptions.find((o) => o.value === searchParams_.experience)?.label}`}
               </p>
+            )}
+          </div>
+
+          {/* Additional filters */}
+          <div className="mt-4 sm:mt-0 flex flex-wrap gap-2">
+            <Select value={searchParams_.country} onValueChange={handleCountryChange} disabled={loadingLocations}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Country" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Countries</SelectItem>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={searchParams_.city}
+              onValueChange={handleCityChange}
+              disabled={loadingLocations || !searchParams_.country}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="City" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Cities</SelectItem>
+                {cities
+                  .filter(
+                    (city) =>
+                      !searchParams_.country ||
+                      jobs.some((job) => job.country === searchParams_.country && job.cities.includes(city)),
+                  )
+                  .map((city) => (
+                    <SelectItem key={city} value={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={searchParams_.remote} onValueChange={handleRemoteChange}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Work Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="true">Remote Only</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {(searchParams_.keyword ||
+              searchParams_.experience ||
+              searchParams_.country ||
+              searchParams_.city ||
+              searchParams_.remote) && (
+              <Button variant="ghost" onClick={clearFilters} className="text-gray-500">
+                Clear Filters
+              </Button>
             )}
           </div>
         </div>
@@ -260,10 +411,7 @@ export default function Jobs() {
             <Briefcase className="mx-auto h-12 w-12 text-gray-400" />
             <p className="text-gray-500 text-lg mt-4">No jobs found</p>
             <p className="text-gray-400 mt-2">Try adjusting your search filters</p>
-            <Button
-              className="mt-4 bg-teal-500 hover:bg-teal-600"
-              onClick={() => setSearchParams({ keyword: "", experience: "", page: 1 })}
-            >
+            <Button className="mt-4 bg-teal-500 hover:bg-teal-600" onClick={clearFilters}>
               Clear filters
             </Button>
           </div>

@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -8,22 +10,24 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Toaster, toast } from "react-hot-toast"
-import { Loader2, Briefcase, Building2, MapPin, Calendar, DollarSign, Link2, FileText, Plus, X, Search, Check } from 'lucide-react'
-import { Badge } from "@/components/ui/badge"
-import { 
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList
-} from "@/components/ui/command"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+  Loader2,
+  Briefcase,
+  Building2,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Link2,
+  FileText,
+  Plus,
+  X,
+  Check,
+} from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000"
 
@@ -38,6 +42,10 @@ interface PaginationInfo {
   limit: number
   pages: number
 }
+interface CityInputProps {
+  cities: string[];
+  setCities: React.Dispatch<React.SetStateAction<string[]>>;
+}
 
 interface CompanyResponse {
   companies: Company[]
@@ -45,14 +53,19 @@ interface CompanyResponse {
 }
 
 interface JobFormData {
-  role: string;
-  experience: string;
-  location: string;
-  companyId: string;
-  expected_salary: string;
-  applylink: string;
-  last_date: string;
-  description: string;
+  role: string
+  min_experience: string
+  max_experience: string
+  country: string
+  cities: string[]
+  remote: boolean
+  companyId: string
+  min_salary: string
+  max_salary: string
+  currency: string
+  applylink: string
+  last_date: string
+  description: string
 }
 
 // Separate skill input component for better performance
@@ -133,6 +146,84 @@ const SkillInput = ({
   )
 }
 
+// City input component
+const CityInput = ({
+  cities,
+  setCities,
+}: {
+  cities: string[]
+  setCities: React.Dispatch<React.SetStateAction<string[]>>
+}) => {
+  const [currentCity, setCurrentCity] = useState("")
+
+  const addCity = useCallback(() => {
+    if (currentCity.trim() && !cities.includes(currentCity.trim())) {
+      setCities((prev) => [...prev, currentCity.trim()])
+      setCurrentCity("")
+    }
+  }, [currentCity, cities, setCities])
+
+  const removeCity = useCallback(
+    (cityToRemove: string) => {
+      setCities((prev) => prev.filter((city) => city !== cityToRemove))
+    },
+    [setCities],
+  )
+
+  const handleCityKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault()
+        addCity()
+      }
+    },
+    [addCity],
+  )
+
+  return (
+    <div className="space-y-2">
+      <Label className="flex items-center">
+        <MapPin className="h-4 w-4 mr-2 text-gray-500" />
+        Cities
+      </Label>
+      <div className="flex gap-2">
+        <Input
+          placeholder="Add a city and press Enter"
+          value={currentCity}
+          onChange={(e) => setCurrentCity(e.target.value)}
+          onKeyDown={handleCityKeyDown}
+        />
+        <Button type="button" variant="outline" onClick={addCity} className="shrink-0">
+          <Plus className="h-4 w-4 mr-2" />
+          Add
+        </Button>
+      </div>
+
+      {cities.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {cities.map((city, index) => (
+            <Badge
+              key={index}
+              variant="secondary"
+              className="flex items-center gap-1 bg-blue-50 text-blue-700 hover:bg-blue-100"
+            >
+              {city}
+              <button
+                type="button"
+                onClick={() => removeCity(city)}
+                className="ml-1 rounded-full hover:bg-blue-200 p-0.5"
+              >
+                <X className="h-3 w-3" />
+                <span className="sr-only">Remove {city}</span>
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function CreateJobPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -146,38 +237,62 @@ export default function CreateJobPage() {
 
   const [formData, setFormData] = useState<JobFormData>({
     role: "",
-    experience: "",
-    location: "",
+    min_experience: "0",
+    max_experience: "",
+    country: "",
+    cities: [],
+    remote: false,
     companyId: "",
-    expected_salary: "",
+    min_salary: "",
+    max_salary: "",
+    currency: "INR",
     applylink: "",
     last_date: "",
     description: "",
-  });
-  
+  })
+
+  // Currency options
+  const currencyOptions = [
+    { value: "INR", label: "Indian Rupee (₹)" },
+    { value: "USD", label: "US Dollar ($)" },
+    { value: "EUR", label: "Euro (€)" },
+    { value: "GBP", label: "British Pound (£)" },
+  ]
+
   // Fetch companies with search query
-  const fetchCompanies = useCallback(async (searchTerm = "", page = 1) => {
-    setLoadingCompanies(true)
-    try {
-      const queryParams = new URLSearchParams({
-        search: searchTerm,
-        page: page.toString(),
-        limit: "100"
-      }).toString()
-      
-      const res = await fetch(`${BASE_URL}/api/companies/names-and-ids?${queryParams}`)
-      if (!res.ok) throw new Error("Failed to fetch companies")
-      
-      const data: CompanyResponse = await res.json()
-      setCompanies(data.companies)
-      setPaginationInfo(data.pagination)
-    } catch (error) {
-      toast.error("Failed to load companies")
-      console.error(error)
-    } finally {
-      setLoadingCompanies(false)
-    }
-  }, [BASE_URL])
+  const fetchCompanies = useCallback(
+    async (searchTerm = "", page = 1) => {
+      setLoadingCompanies(true)
+      try {
+        const queryParams = new URLSearchParams({
+          search: searchTerm,
+          page: page.toString(),
+          limit: "100",
+        }).toString()
+
+        const res = await fetch(`${BASE_URL}/api/companies/names-and-ids?${queryParams}`)
+        if (!res.ok) throw new Error("Failed to fetch companies")
+
+        const data: CompanyResponse = await res.json()
+        setCompanies(data.companies)
+        setPaginationInfo(data.pagination)
+      } catch (error) {
+        toast.error("Failed to load companies", {
+          duration: 4000,
+          style: {
+            background: "#e74c3c",
+            color: "white",
+            borderRadius: "8px",
+            padding: "12px 24px",
+          },
+        })
+        console.error(error)
+      } finally {
+        setLoadingCompanies(false)
+      }
+    },
+    [BASE_URL],
+  )
 
   // Initial fetch
   useEffect(() => {
@@ -190,14 +305,14 @@ export default function CreateJobPage() {
     if (searchDebounceTimeout) {
       clearTimeout(searchDebounceTimeout)
     }
-    
+
     // Set new timeout
     const timeout = setTimeout(() => {
       fetchCompanies(companySearch)
     }, 300) // 300ms debounce
-    
+
     setSearchDebounceTimeout(timeout)
-    
+
     // Cleanup
     return () => {
       if (searchDebounceTimeout) {
@@ -216,29 +331,34 @@ export default function CreateJobPage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }, [])
 
+  const handleCheckboxChange = useCallback((name: string, checked: boolean) => {
+    setFormData((prev) => ({ ...prev, [name]: checked }))
+  }, [])
+
   const handleCompanySelect = useCallback((companyId: string) => {
-    setFormData(prev => ({ ...prev, companyId }))
+    setFormData((prev) => ({ ...prev, companyId }))
     setCompanySearchOpen(false)
   }, [])
 
   // Get selected company name
   const selectedCompanyName = useMemo(() => {
-    const company = companies.find(c => c._id === formData.companyId)
+    const company = companies.find((c) => c._id === formData.companyId)
     return company ? company.name : ""
   }, [companies, formData.companyId])
 
   // Memoize experience options to prevent recreation on each render
   const experienceOptions = useMemo(
     () => [
-      { value: "0", label: "Fresher (0 years)" },
+      { value: "0", label: "0 (Fresher)" },
       { value: "1", label: "1 Year" },
       { value: "2", label: "2 Years" },
       { value: "3", label: "3 Years" },
       { value: "4", label: "4 Years" },
       { value: "5", label: "5 Years" },
-      { value: "6", label: "6+ Years" },
-      { value: "8", label: "8+ Years" },
-      { value: "10", label: "10+ Years" },
+      { value: "6", label: "6 Years" },
+      { value: "8", label: "8 Years" },
+      { value: "10", label: "10 Years" },
+      { value: "15", label: "15 Years" },
     ],
     [],
   )
@@ -247,22 +367,36 @@ export default function CreateJobPage() {
   const validateForm = useCallback(() => {
     if (
       !formData.role ||
-      !formData.experience ||
-      !formData.location ||
+      !formData.country ||
       !formData.companyId ||
-      !formData.expected_salary ||
       !formData.applylink ||
       !formData.last_date ||
       !formData.description ||
       skills.length === 0
     ) {
-      toast.error("All fields are required")
+      toast.error("Validation Error: Please fill in all required fields", {
+        duration: 4000,
+        style: {
+          background: "#e74c3c",
+          color: "white",
+          borderRadius: "8px",
+          padding: "12px 24px",
+        },
+      })
       return false
     }
 
     // Validate URL
     if (!formData.applylink.startsWith("http")) {
-      toast.error("Apply link must be a valid URL starting with http:// or https://")
+      toast.error("Invalid URL: Apply link must be a valid URL starting with http:// or https://", {
+        duration: 4000,
+        style: {
+          background: "#e74c3c",
+          color: "white",
+          borderRadius: "8px",
+          padding: "12px 24px",
+        },
+      })
       return false
     }
 
@@ -270,7 +404,61 @@ export default function CreateJobPage() {
     const selectedDate = new Date(formData.last_date)
     const today = new Date()
     if (selectedDate <= today) {
-      toast.error("Last date must be in the future")
+      toast.error("Invalid Date: Last date must be in the future", {
+        duration: 4000,
+        style: {
+          background: "#e74c3c",
+          color: "white",
+          borderRadius: "8px",
+          padding: "12px 24px",
+        },
+      })
+      return false
+    }
+
+    // Validate max experience is greater than min experience
+    if (
+      formData.min_experience &&
+      formData.max_experience &&
+      Number(formData.min_experience) > Number(formData.max_experience)
+    ) {
+      toast.error("Invalid Experience Range: Maximum experience must be greater than minimum experience", {
+        duration: 4000,
+        style: {
+          background: "#e74c3c",
+          color: "white",
+          borderRadius: "8px",
+          padding: "12px 24px",
+        },
+      })
+      return false
+    }
+
+    // Validate salary
+    if ((formData.min_salary && !formData.currency) || (formData.max_salary && !formData.currency)) {
+      toast.error("Please select a currency when specifying salary", {
+        duration: 4000,
+        style: {
+          background: "#e74c3c",
+          color: "white",
+          borderRadius: "8px",
+          padding: "12px 24px",
+        },
+        icon: "⚠️",
+      })
+      return false
+    }
+
+    if (formData.min_salary && formData.max_salary && Number(formData.min_salary) > Number(formData.max_salary)) {
+      toast.error("Invalid Salary Range: Maximum salary must be greater than minimum salary", {
+        duration: 4000,
+        style: {
+          background: "#e74c3c",
+          color: "white",
+          borderRadius: "8px",
+          padding: "12px 24px",
+        },
+      })
       return false
     }
 
@@ -279,63 +467,91 @@ export default function CreateJobPage() {
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
-      e.preventDefault();
-  
-      if (!validateForm()) return;
-  
-      setLoading(true);
-  
+      e.preventDefault()
+
+      if (!validateForm()) return
+
+      setLoading(true)
+
       try {
+        const jobData = {
+          role: formData.role,
+          min_experience: Number(formData.min_experience),
+          max_experience: formData.max_experience ? Number(formData.max_experience) : undefined,
+          country: formData.country,
+          cities: formData.cities,
+          remote: formData.remote,
+          companyId: formData.companyId,
+          min_salary: formData.min_salary ? Number(formData.min_salary) : undefined,
+          max_salary: formData.max_salary ? Number(formData.max_salary) : undefined,
+          currency: formData.currency,
+          applylink: formData.applylink,
+          last_date: formData.last_date,
+          description: formData.description,
+          skills_required: skills,
+        }
+
         const response = await fetch(`${BASE_URL}/api/jobs`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           credentials: "include", // Include cookies for auth
-          body: JSON.stringify({
-            role: formData.role,
-            experience: formData.experience,
-            location: formData.location,
-            companyId: formData.companyId,
-            expected_salary: formData.expected_salary,
-            applylink: formData.applylink,
-            last_date: formData.last_date,
-            description: formData.description,
-            skills_required: skills, // Ensure this is an array
-          }),
-        });
-  
+          body: JSON.stringify(jobData),
+        })
+
         if (!response.ok) {
-          throw new Error(`Server Error: ${response.statusText}`);
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Server Error")
         }
-  
-        const data = await response.json();
-        toast.success("Job created successfully!");
-  
+
+        const data = await response.json()
+        toast.success("Job created successfully!")
+
+        // Reset form
         setFormData({
           role: "",
-          experience: "",
-          location: "",
+          min_experience: "0",
+          max_experience: "",
+          country: "",
+          cities: [],
+          remote: false,
           companyId: "",
-          expected_salary: "",
+          min_salary: "",
+          max_salary: "",
+          currency: "INR",
           applylink: "",
           last_date: "",
           description: "",
-        });
-        setSkills([]);
-  
+        })
+        setSkills([])
+
         setTimeout(() => {
-          router.push("/admin");
-        }, 1500);
+          router.push("/admin")
+        }, 1500)
       } catch (error: any) {
-        toast.error(error.message || "Failed to create job");
+        toast.error(
+          <div>
+            <strong>Error:</strong> {error.message || "Failed to create job"}
+          </div>,
+          {
+            duration: 4000, // Duration for how long the toast will be visible
+            style: {
+              background: "#e74c3c", // Red background for error
+              color: "white",
+              borderRadius: "8px",
+              padding: "12px 24px",
+            },
+            icon: "⚠️", // Optional icon to represent error
+          }
+        );
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     },
-    [validateForm, router, formData, skills, BASE_URL]
-  );
-  
+    [validateForm, router, formData, skills, BASE_URL],
+  )
+
   // Format today's date for min attribute - memoized
   const today = useMemo(() => new Date().toISOString().split("T")[0], [])
 
@@ -348,7 +564,7 @@ export default function CreateJobPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <Toaster position="top-center" />
+      <Toaster />
 
       <Card className="shadow-md border-0 m-3 p-3">
         <CardHeader>
@@ -370,7 +586,7 @@ export default function CreateJobPage() {
               <div className="space-y-2">
                 <Label htmlFor="role" className="flex items-center">
                   <Briefcase className="h-4 w-4 mr-2 text-gray-500" />
-                  Job Title
+                  Job Title *
                 </Label>
                 <Input
                   id="role"
@@ -382,17 +598,56 @@ export default function CreateJobPage() {
                 />
               </div>
 
-              {/* Experience */}
+              {/* Country */}
               <div className="space-y-2">
-                <Label htmlFor="experience" className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                  Experience (Years)
+                <Label htmlFor="country" className="flex items-center">
+                  <MapPin className="h-4 w-4 mr-2 text-gray-500" />
+                  Country *
                 </Label>
-                <Select value={formData.experience} onValueChange={(value) => handleSelectChange("experience", value)}>
-                  <SelectTrigger id="experience">
-                    <SelectValue placeholder="Select experience level" />
+                <Input
+                  id="country"
+                  name="country"
+                  placeholder="e.g. India, USA"
+                  value={formData.country}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+                <CityInput
+                cities={formData.cities}
+                setCities={(update) => setFormData((prev) => ({ ...prev, cities: typeof update === "function" ? update(prev.cities) : update }))}
+
+                />
+
+              {/* Remote Option */}
+              <div className="space-y-2 flex items-center">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="remote"
+                    checked={formData.remote}
+                    onCheckedChange={(checked) => handleCheckboxChange("remote", checked as boolean)}
+                  />
+                  <Label htmlFor="remote" className="cursor-pointer">
+                    This is a remote job
+                  </Label>
+                </div>
+              </div>
+
+              {/* Min Experience */}
+              <div className="space-y-2">
+                <Label htmlFor="min_experience" className="flex items-center">
+                  <Calendar className="h-4 w-4 mr-2 text-gray-500" />
+                  Minimum Experience (Years)
+                </Label>
+                <Select
+                  value={formData.min_experience}
+                  onValueChange={(value) => handleSelectChange("min_experience", value)}
+                >
+                  <SelectTrigger id="min_experience">
+                    <SelectValue placeholder="Select minimum experience" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-50"> 
+                  <SelectContent className="bg-gray-50">
                     {experienceOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
@@ -402,27 +657,37 @@ export default function CreateJobPage() {
                 </Select>
               </div>
 
-              {/* Location */}
+              {/* Max Experience */}
               <div className="space-y-2">
-                <Label htmlFor="location" className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-2 text-gray-500" />
-                  Location
+                <Label htmlFor="max_experience" className="flex items-center">
+                  <Calendar className="h-4 w-4 mr-2 text-gray-500" />
+                  Maximum Experience (Years)
                 </Label>
-                <Input
-                  id="location"
-                  name="location"
-                  placeholder="e.g. Bangalore, Remote"
-                  value={formData.location}
-                  onChange={handleChange}
-                  required
-                />
+                <Select
+                  value={formData.max_experience}
+                  onValueChange={(value) => handleSelectChange("max_experience", value)}
+                >
+                  <SelectTrigger id="max_experience">
+                    <SelectValue placeholder="Select maximum experience (optional)" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-50">
+                    <SelectItem value="no_maximum">No maximum</SelectItem>
+                    {experienceOptions
+                      .filter((option) => Number(option.value) > Number(formData.min_experience))
+                      .map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Company - Enhanced with searchable dropdown */}
               <div className="space-y-2">
                 <Label htmlFor="companyId" className="flex items-center">
                   <Building2 className="h-4 w-4 mr-2 text-gray-500" />
-                  Company
+                  Company *
                 </Label>
                 <Popover open={companySearchOpen} onOpenChange={setCompanySearchOpen}>
                   <PopoverTrigger asChild>
@@ -445,8 +710,8 @@ export default function CreateJobPage() {
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0 bg-white" align="start">
                     <Command>
-                      <CommandInput 
-                        placeholder="Search company..." 
+                      <CommandInput
+                        placeholder="Search company..."
                         value={companySearch}
                         onValueChange={setCompanySearch}
                         className="h-9"
@@ -481,16 +746,14 @@ export default function CreateJobPage() {
                         </CommandGroup>
                         {paginationInfo && paginationInfo.page < paginationInfo.pages && (
                           <div className="py-2 px-2 text-center border-t">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={handleLoadMore}
                               disabled={loadingCompanies}
                               className="text-xs text-blue-600 hover:text-blue-800"
                             >
-                              {loadingCompanies ? (
-                                <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                              ) : null}
+                              {loadingCompanies ? <Loader2 className="h-3 w-3 mr-2 animate-spin" /> : null}
                               Load more results
                             </Button>
                           </div>
@@ -501,19 +764,55 @@ export default function CreateJobPage() {
                 </Popover>
               </div>
 
-              {/* Expected Salary */}
+              {/* Currency */}
               <div className="space-y-2">
-                <Label htmlFor="expected_salary" className="flex items-center">
+                <Label htmlFor="currency" className="flex items-center">
                   <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
-                  Expected Salary
+                  Currency
+                </Label>
+                <Select value={formData.currency} onValueChange={(value) => handleSelectChange("currency", value)}>
+                  <SelectTrigger id="currency">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-50">
+                    {currencyOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Min Salary */}
+              <div className="space-y-2">
+                <Label htmlFor="min_salary" className="flex items-center">
+                  <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
+                  Minimum Salary (LPA)
                 </Label>
                 <Input
-                  id="expected_salary"
-                  name="expected_salary"
-                  placeholder="e.g. ₹15-20 LPA"
-                  value={formData.expected_salary}
+                  id="min_salary"
+                  name="min_salary"
+                  type="number"
+                  placeholder="e.g. 10"
+                  value={formData.min_salary}
                   onChange={handleChange}
-                  required
+                />
+              </div>
+
+              {/* Max Salary */}
+              <div className="space-y-2">
+                <Label htmlFor="max_salary" className="flex items-center">
+                  <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
+                  Maximum Salary (LPA)
+                </Label>
+                <Input
+                  id="max_salary"
+                  name="max_salary"
+                  type="number"
+                  placeholder="e.g. 15"
+                  value={formData.max_salary}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -521,7 +820,7 @@ export default function CreateJobPage() {
               <div className="space-y-2">
                 <Label htmlFor="last_date" className="flex items-center">
                   <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                  Last Date to Apply
+                  Last Date to Apply *
                 </Label>
                 <Input
                   id="last_date"
@@ -538,7 +837,7 @@ export default function CreateJobPage() {
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="applylink" className="flex items-center">
                   <Link2 className="h-4 w-4 mr-2 text-gray-500" />
-                  Application URL
+                  Application URL *
                 </Label>
                 <Input
                   id="applylink"
@@ -557,7 +856,7 @@ export default function CreateJobPage() {
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="description" className="flex items-center">
                   <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                  Job Description
+                  Job Description *
                 </Label>
                 <Textarea
                   id="description"
@@ -566,10 +865,9 @@ export default function CreateJobPage() {
                   value={formData.description}
                   onChange={handleChange}
                   className="min-h-[100px]"
-                  maxLength={100}
                   required
                 />
-                <p className="text-xs text-gray-500">{formData.description.length}/100 characters (max)</p>
+                <p className="text-xs text-gray-500">{formData.description.length} characters</p>
               </div>
             </div>
 
@@ -601,3 +899,4 @@ export default function CreateJobPage() {
     </div>
   )
 }
+
