@@ -515,45 +515,44 @@ export default function HomePage() {
               <div className="block sm:hidden">
                 <Swiper {...swiperSettings} className="w-full">
                   {topCompanies.map((company) => (
-                    <SwiperSlide key={company._id} className="flex justify-center">
-                      <Link href={`/companies/${company._id}`}>
-                        <Card className="bg-white border border-gray-200 mx-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 rounded-xl overflow-hidden w-full max-w-xs cursor-pointer">
-                          <CardContent className="p-6">
-                            {/* Company Logo / Initial */}
-                            <div className="flex items-center mb-4">
-                              <div className="relative">
-                                <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center text-xl font-bold text-teal-600 overflow-hidden">
-                                  {company.name.charAt(0).toUpperCase()}
-                                </div>
-                                {company.verified && (
-                                  <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1">
-                                    <CheckCircle className="h-4 w-4 text-white" />
-                                  </div>
-                                )}
-                              </div>
-                              <div className="ml-4">
-                                <h3 className="font-semibold text-gray-900 text-lg group-hover:text-teal-600 transition-colors">
-                                  {company.name}
-                                </h3>
-                                <div className="flex items-center text-yellow-500">
-                                  {renderStarRating(company.avgRating)}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Reviews & Engagement */}
-                            <div className="flex items-center justify-between text-gray-600 text-sm mt-4">
-                              <div className="flex items-center">
-                                <Users className="h-5 w-5 mr-1.5 text-gray-500" />
-                                <span className="font-medium">
-                                  {company.TotalReviews} {company.TotalReviews === 1 ? "Review" : "Reviews"}
-                                </span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    </SwiperSlide>
+                   <SwiperSlide key={company._id} className="flex justify-center">
+                   <Card className="bg-white border border-gray-200 mx-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 rounded-xl overflow-hidden w-full max-w-xs cursor-pointer">
+                     <CardContent className="p-6">
+                       {/* Company Logo / Initial */}
+                       <div className="flex items-center mb-4">
+                         <div className="relative">
+                           <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center text-xl font-bold text-teal-600 overflow-hidden">
+                             {company.name.charAt(0).toUpperCase()}
+                           </div>
+                           {company.verified && (
+                             <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1">
+                               <CheckCircle className="h-4 w-4 text-white" />
+                             </div>
+                           )}
+                         </div>
+                         <div className="ml-4">
+                           <h3 className="font-semibold text-gray-900 text-lg group-hover:text-teal-600 transition-colors">
+                             {company.name}
+                           </h3>
+                           <div className="flex items-center text-yellow-500">
+                             {renderStarRating(company.avgRating)}
+                           </div>
+                         </div>
+                       </div>
+                 
+                       {/* Reviews & Engagement */}
+                       <div className="flex items-center justify-between text-gray-600 text-sm mt-4">
+                         <div className="flex items-center">
+                           <Users className="h-5 w-5 mr-1.5 text-gray-500" />
+                           <span className="font-medium">
+                             {company.TotalReviews} {company.TotalReviews === 1 ? "Review" : "Reviews"}
+                           </span>
+                         </div>
+                       </div>
+                     </CardContent>
+                   </Card>
+                 </SwiperSlide>
+                 
                   ))}
                 </Swiper>
               </div>
