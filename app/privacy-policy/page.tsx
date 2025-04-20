@@ -7,7 +7,7 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
       {/* Hero Section with Wavy Curve */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6 py-4  text-white overflow-hidden">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6 py-4 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center mb-8">
             <Link href="/" className="flex items-center text-white hover:text-white/80 transition-colors">
@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
       </div>
 
       {/* Privacy Policy Content */}
-      <div className="max-w-full sm:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-white shadow-xl rounded-2xl ">
+      <div className="max-w-full sm:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-white shadow-xl rounded-2xl">
         <div className="prose prose-blue max-w-none">
           <p className="text-gray-500 text-sm sm:text-base mb-8 sm:mb-10 italic">
             Effective Date: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -100,8 +100,36 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
+          {/* New Ezoic Section */}
           <section className="mb-10 sm:mb-12">
-            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">5. Disclaimer and Limitation of Liability</h2>
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">5. Ezoic Services</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8 mb-4">
+              We use Ezoic, a third-party service, to optimize our website, deliver advertisements, and analyze user
+              behavior. Ezoic and its partners may collect and process personal data, including through the use of
+              cookies and other tracking technologies, to provide these services.
+            </p>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8 mb-4">
+              For detailed information about how Ezoic and its partners use your information, including a list of
+              known cookies used on our site, please refer to Ezoic's Privacy Policy at{' '}
+              <a
+                href="http://g.ezoic.net/privacy/careerondoor.tech"
+                className="text-teal-600 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                http://g.ezoic.net/privacy/careerondoor.tech
+              </a>.
+            </p>
+            {/* Ezoic Cloud Embed Point */}
+            <span id="ezoic-privacy-policy-embed"></span>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              By using our website, you consent to the data practices described in both our Privacy Policy and
+              Ezoic's Privacy Policy.
+            </p>
+          </section>
+
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">6. Disclaimer and Limitation of Liability</h2>
             <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
               We strive to provide accurate information but do not guarantee the completeness or reliability of content
               on our platform.
@@ -115,7 +143,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-10 sm:mb-12">
-            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">6. Data Security</h2>
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">7. Data Security</h2>
             <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
               We implement industry-standard security measures to protect your data. However, no online platform can
               guarantee absolute security.
@@ -123,8 +151,8 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-10 sm:mb-12">
-            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">7. Your Choices & Rights</h2>
-              <ul className="list-disc pl-5 sm:pl-6 space-y-2 text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">8. Your Choices & Rights</h2>
+            <ul className="list-disc pl-5 sm:pl-6 space-y-2 text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
               <li>Manage cookie preferences through your browser settings.</li>
               <li>Opt out of Google Analytics tracking using Google's opt-out tools.</li>
               <li>Contact us at <a href="mailto:careerondoor@gmail.com" className="text-teal-600 hover:underline">careerondoor@gmail.com</a> to delete or modify your personal data.</li>
@@ -132,7 +160,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-10 sm:mb-12">
-            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">8. Changes to This Policy</h2>
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">9. Changes to This Policy</h2>
             <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
               We may update this Privacy Policy periodically. Changes will be posted on this page with an updated
               effective date. Please check this page regularly for updates.
@@ -140,7 +168,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-10 sm:mb-12">
-            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">9. Contact Us</h2>
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">10. Contact Us</h2>
             <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">For questions or concerns about this Privacy Policy, contact us at:</p>
             <ul className="list-disc pl-5 sm:pl-6 space-y-2 text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
               <li>CareerOnDoor</li>
@@ -149,7 +177,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <p className="text-gray-700 text-sm sm:text-base font-medium text-center mt-10 sm:mt-12">
-            By using our website, you agree to this Privacy Policy.
+            By using our website, you agree to this Privacy Policy and the data practices of our third-party partners, including Ezoic.
           </p>
         </div>
       </div>
