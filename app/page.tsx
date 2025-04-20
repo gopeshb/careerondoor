@@ -560,7 +560,7 @@ export default function HomePage() {
               {/* Desktop: Grid Layout */}
               <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {topCompanies.map((company) => (
-                  <Link key={company._id} href={`/companies/${company._id}`}>
+               
                     <Card className="bg-white border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 rounded-xl overflow-hidden w-full cursor-pointer">
                       <CardContent className="p-6">
                         {/* Company Logo / Initial */}
@@ -596,7 +596,6 @@ export default function HomePage() {
                         </div>
                       </CardContent>
                     </Card>
-                  </Link>
                 ))}
               </div>
             </div>
