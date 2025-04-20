@@ -7,10 +7,10 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft, Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2, XCircle } from "lucide-react"
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
 import Link from "next/link"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
 export default function ResetPasswordPage() {
   const [formData, setFormData] = useState({
@@ -35,6 +35,7 @@ export default function ResetPasswordPage() {
       if (!token || !email) {
         setTokenValid(false)
         setValidating(false)
+        setError("Missing reset token or email. Please request a new password reset link.")
         return
       }
 
@@ -45,13 +46,25 @@ export default function ResetPasswordPage() {
           body: JSON.stringify({ token, email }),
         })
 
+        const data = await response.json()
+
         if (response.ok) {
           setTokenValid(true)
         } else {
           setTokenValid(false)
+          // Set more specific error messages based on the response
+          if (response.status === 404) {
+            setError("User not found. Please check your email address.")
+          } else if (response.status === 410) {
+            setError("This reset link has expired. Please request a new one.")
+          } else {
+            setError(data.message || "Invalid or expired reset link. Please request a new one.")
+          }
         }
       } catch (error) {
         setTokenValid(false)
+        setError("Network error. Please check your connection and try again.")
+        console.error("Token validation error:", error)
       } finally {
         setValidating(false)
       }
@@ -75,6 +88,19 @@ export default function ResetPasswordPage() {
       setError("Password must be at least 6 characters long")
       return false
     }
+
+    // Check for at least one number
+    if (!/\d/.test(password)) {
+      setError("Password must contain at least one number")
+      return false
+    }
+
+    // Check for at least one letter
+    if (!/[a-zA-Z]/.test(password)) {
+      setError("Password must contain at least one letter")
+      return false
+    }
+
     return true
   }
 
@@ -111,19 +137,39 @@ export default function ResetPasswordPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, email, password }),
+        credentials: "include",
       })
 
       const data = await response.json()
 
       if (!response.ok) {
+        // Handle different error status codes
+        if (response.status === 400) {
+          setError(data.message || "Invalid request. Please check your information.")
+        } else if (response.status === 401) {
+          setError("Invalid or expired token. Please request a new password reset link.")
+        } else if (response.status === 404) {
+          setError("User not found. Please check your email address.")
+        } else if (response.status === 429) {
+          setError("Too many attempts. Please try again later.")
+        } else {
+          setError(data.message || "Failed to reset password. Please try again.")
+        }
         throw new Error(data.message || "Failed to reset password")
       }
 
       setSuccess(true)
       toast.success("Password reset successfully!")
     } catch (error: any) {
-      setError(error.message || "Failed to reset password. Please try again.")
-      toast.error(error.message || "Failed to reset password")
+      // Check if it's a network error
+      if (error.name === "TypeError" && error.message.includes("Failed to fetch")) {
+        setError("Network error. Please check your connection and try again.")
+        toast.error("Network error. Please check your connection.")
+      } else {
+        // Use the error message already set above for API errors
+        toast.error(error.message || "Failed to reset password")
+      }
+      console.error("Reset password error:", error)
     } finally {
       setLoading(false)
     }
@@ -131,10 +177,8 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
-      <Toaster position="top-center" />
-
       {/* Hero Section with Wavy Curve */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-16 pb-20 px-6 text-white">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6  text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center mb-8">
             <Link href="/signin" className="flex items-center text-white hover:text-white/80 transition-colors">
@@ -239,6 +283,49 @@ export default function ResetPasswordPage() {
                   </div>
                 </div>
 
+                <div className="mt-2">
+                  <div className="text-xs flex justify-between mb-1">
+                    <span>Password strength:</span>
+                    <span
+                      className={`font-medium ${
+                        !formData.password
+                          ? "text-gray-400"
+                          : formData.password.length < 6
+                            ? "text-red-500"
+                            : formData.password.length < 8
+                              ? "text-orange-500"
+                              : "text-green-500"
+                      }`}
+                    >
+                      {!formData.password
+                        ? "None"
+                        : formData.password.length < 6
+                          ? "Weak"
+                          : formData.password.length < 8
+                            ? "Medium"
+                            : "Strong"}
+                    </span>
+                  </div>
+                  <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${
+                        !formData.password
+                          ? "w-0"
+                          : formData.password.length < 6
+                            ? "w-1/4 bg-red-500"
+                            : formData.password.length < 8
+                              ? "w-1/2 bg-orange-500"
+                              : "w-full bg-green-500"
+                      } transition-all duration-300`}
+                    ></div>
+                  </div>
+                  <ul className="text-xs text-gray-500 mt-1 space-y-1 list-disc pl-4">
+                    <li className={formData.password.length >= 6 ? "text-green-500" : ""}>At least 6 characters</li>
+                    <li className={/\d/.test(formData.password) ? "text-green-500" : ""}>At least one number</li>
+                    <li className={/[a-zA-Z]/.test(formData.password) ? "text-green-500" : ""}>At least one letter</li>
+                  </ul>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="text-sm font-medium">
                     Confirm New Password
@@ -258,8 +345,8 @@ export default function ResetPasswordPage() {
                   </div>
 
                   {error && (
-                    <div className="flex items-start mt-1.5 text-red-500 text-sm">
-                      <AlertCircle className="h-4 w-4 mr-1.5 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start mt-3 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+                      <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 text-red-500" />
                       <span>{error}</span>
                     </div>
                   )}
@@ -294,4 +381,3 @@ export default function ResetPasswordPage() {
     </div>
   )
 }
-

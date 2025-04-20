@@ -123,15 +123,15 @@ export default function Jobs() {
         queryParams.append("keyword", searchParams_.keyword)
       }
 
-      if (searchParams_.experience) {
+      if (searchParams_.experience && searchParams_.experience !== "all") {
         queryParams.append("experience", searchParams_.experience)
       }
 
-      if (searchParams_.country) {
+      if (searchParams_.country && searchParams_.country !== "all") {
         queryParams.append("country", searchParams_.country)
       }
 
-      if (searchParams_.city) {
+      if (searchParams_.city && searchParams_.city !== "all") {
         queryParams.append("city", searchParams_.city)
       }
 
@@ -142,7 +142,7 @@ export default function Jobs() {
       queryParams.append("page", searchParams_.page.toString())
       queryParams.append("limit", "10") // 10 jobs per page
 
-      const response = await fetch(`${BASE_API_URL}/api/jobs?${queryParams.toString()}`)
+      const response = await fetch(`${BASE_API_URL}/api/jobs${queryParams.toString() ? `?${queryParams.toString()}` : ""}`)
 
       if (!response.ok) {
         throw new Error("Failed to fetch jobs")
@@ -254,7 +254,7 @@ export default function Jobs() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6 text-white">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6  text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Find Your Dream Job</h1>
           <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto text-center mb-8">
@@ -293,6 +293,17 @@ export default function Jobs() {
               </Button>
             </div>
           </form>
+            <div className="mt-8 text-center my-1 py-1">
+            <p className="mb-4 text-lg font-medium text-white/80">
+              Have an opportunity to share?
+            </p>
+            <Button
+              className="bg-white text-teal-600 font-semibold hover:bg-teal-50 hover:text-teal-700 transition-all duration-200 px-8 py-3 rounded-full shadow-md"
+              onClick={() => router.push("/jobs/create-job")}
+            >
+              Submit a Job
+            </Button>
+            </div>
         </div>
 
         {/* Wave divider */}

@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft, Mail, AlertCircle, CheckCircle, Loader2 } from "lucide-react"
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
 import Link from "next/link"
 
 export default function ForgotPasswordPage() {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -27,13 +27,13 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     setError(null)
 
-    // Basic email validation
-    if (!email) {
+    // Enhanced email validation
+    if (!email.trim()) {
       setError("Email is required")
       return
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     if (!emailRegex.test(email)) {
       setError("Please enter a valid email address")
       return
@@ -46,19 +46,42 @@ export default function ForgotPasswordPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
+        credentials: "include",
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to process request")
-      }
+        // Handle different error status codes
+        if (response.status === 400) {
+          setError(data.message || "Invalid email format")
+        } else if (response.status === 404) {
+          // For security reasons, we might want to show a generic message even if the email doesn't exist
+          setSuccess(true) // Still show success to prevent email enumeration
+        } else if (response.status === 429) {
+          setError("Too many requests. Please try again later.")
+        } else {
+          setError(data.message || "Failed to process request")
+        }
 
-      setSuccess(true)
-      toast.success("Password reset link sent to your email!")
+        if (response.status !== 404) {
+          // Only throw for non-404 errors
+          throw new Error(data.message || "Failed to process request")
+        }
+      } else {
+        setSuccess(true)
+        toast.success("Password reset link sent to your email!")
+      }
     } catch (error: any) {
-      setError(error.message || "Something went wrong. Please try again.")
-      toast.error(error.message || "Failed to send reset link")
+      // Check if it's a network error
+      if (error.name === "TypeError" && error.message.includes("Failed to fetch")) {
+        setError("Network error. Please check your connection and try again.")
+        toast.error("Network error. Please check your connection.")
+      } else if (!success) {
+        // Don't show error toast if we're showing success UI (for 404)
+        toast.error(error.message || "Failed to send reset link")
+      }
+      console.error("Forgot password error:", error)
     } finally {
       setLoading(false)
     }
@@ -66,10 +89,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
-      <Toaster position="top-center" />
-
       {/* Hero Section with Wavy Curve */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-16 pb-20 px-6 text-white">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6  text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center mb-8">
             <Link href="/signin" className="flex items-center text-white hover:text-white/80 transition-colors">
@@ -156,10 +177,13 @@ export default function ForgotPasswordPage() {
                       required
                     />
                   </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    We'll send a password reset link to this email address
+                  </div>
 
                   {error && (
-                    <div className="flex items-start mt-1.5 text-red-500 text-sm">
-                      <AlertCircle className="h-4 w-4 mr-1.5 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start mt-3 p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+                      <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 text-red-500" />
                       <span>{error}</span>
                     </div>
                   )}
@@ -179,6 +203,14 @@ export default function ForgotPasswordPage() {
                     "Send Reset Link"
                   )}
                 </Button>
+                <div className="text-xs text-gray-500 mt-4">
+                  <p>Didn't receive the email?</p>
+                  <ul className="list-disc pl-5 mt-1 space-y-1">
+                    <li>Check your spam or junk folder</li>
+                    <li>Make sure you entered the correct email address</li>
+                    <li>Allow a few minutes for the email to arrive</li>
+                  </ul>
+                </div>
               </form>
             )}
 
@@ -205,4 +237,3 @@ export default function ForgotPasswordPage() {
     </div>
   )
 }
-

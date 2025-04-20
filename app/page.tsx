@@ -180,7 +180,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-teal-500 to-blue-600 pt-24 pb-32 px-6 text-white overflow-hidden">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6  text-white overflow-hidden">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/20"></div>

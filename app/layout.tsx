@@ -25,14 +25,32 @@ export default function RootLayout({
     <html lang="en">
       <head>
       
-      <meta name="google-adsense-account" content="ca-pub-9075132581085185">
-      </meta>
+
       <meta name="google-site-verification" content="KEEzMzycN6LOuzLZTQ6dPnuOKG5_xzDBWlB8DMmQhsU" />
       </head>
       <body data-new-gr-c-s-check-loaded="14.1096.0"
                          data-gr-ext-installed="">
         <StoreProvider> 
-         <Toaster position="top-center" toastOptions={{ style: { zIndex: 9999 } }} />
+        <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: "#FFFFFF",
+            color: "#334155",
+            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+            borderRadius: "0.75rem",
+            padding: "1rem",
+            fontSize: "0.875rem",
+            fontWeight: "500",
+          },
+          success: {
+            iconTheme: {
+              primary: "#10B981",
+              secondary: "#FFFFFF",
+            },
+          },
+        }}
+      />
           <Navbar />
           <main>{children}</main>
           <Footer />

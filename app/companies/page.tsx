@@ -171,7 +171,7 @@ export default function Companies() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6 text-white">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6  text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Find Your Ideal Company</h1>
           <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto text-center mb-8">
@@ -196,10 +196,10 @@ export default function Companies() {
             </div>
           </form>
 
-          <div className="mt-8 text-center">
-            <p className="mb-3 text-white/90">Want to share your experience?</p>
+          <div className="mt-8 text-center my-1 py-1">
+            <p className="mb-4 text-lg font-medium text-white/80">Want to share your experience?</p>
             <Button
-              className="bg-white text-teal-600 font-semibold hover:bg-white/90 px-6 py-3"
+              className="bg-white text-teal-600 font-semibold hover:bg-teal-50 hover:text-teal-700 transition-all duration-200 px-8 py-3 rounded-full shadow-md"
               onClick={() => router.push("/companies/post-review")}
             >
               Post a Company Review

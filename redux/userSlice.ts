@@ -8,6 +8,7 @@ interface User {
   email: string;
   avatar: string;
   admin: boolean;
+  tokenExpiry: number;
 }
 
 interface UserState {

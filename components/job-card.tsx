@@ -32,7 +32,6 @@ interface JobProps {
     max_salary?: number
     currency: string
     applylink: string
-    last_date?: string
   }
 }
 
@@ -145,12 +144,7 @@ export default function JobCard({ job }: JobProps) {
               <Briefcase className="h-4 w-4 mr-1" />
               <span>{formatExperience(job.min_experience, job.max_experience)}</span>
             </div>
-            {job.last_date && (
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
-                <span>Apply by: {new Date(job.last_date).toLocaleDateString()}</span>
-              </div>
-            )}
+            
           </div>
 
           <div className="pt-4 mt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">

@@ -7,7 +7,7 @@ export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
       {/* Hero Section with Wavy Curve */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-16 pb-20 px-6 text-white">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6  text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center mb-8">
             <Link href="/" className="flex items-center text-white hover:text-white/80 transition-colors">
@@ -34,128 +34,101 @@ export default function TermsOfServicePage() {
         </div>
       </div>
 
-      {/* Terms of Service Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12 bg-white shadow-md rounded-lg relative z-10">
+      <div className="max-w-full sm:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-white shadow-xl rounded-2xl ">
         <div className="prose prose-blue max-w-none">
-          <p className="text-gray-500 mb-8">Effective Date: {new Date().toLocaleDateString()}</p>
+          <p className="text-gray-500 text-sm sm:text-base mb-8 sm:mb-10 italic">
+            Effective Date: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">1. Introduction</h2>
-            <p>
-              Welcome to CareerOnDoor ("we," "our," "us"). By accessing or using our platform, including all the
-              content, services, and features available through our website (careerondoor.com), you agree to be bound by
-              the following terms and conditions ("Terms"). Please read them carefully.
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">1. Introduction</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              Welcome to CareerOnDoor ("we," "our," "us"). By accessing or using our platform, including all content, services, and features available through our website (careerondoor.com), you agree to be bound by these Terms and Conditions ("Terms"). Please read them carefully to understand your rights and responsibilities.
             </p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">2. Service Description</h2>
-            <p>
-              Our platform provides a job search service to help users find job opportunities and company listings. We
-              aim to ease your job search process by offering relevant information, resources, and connections. However,
-              we do not guarantee the accuracy or reliability of the information available on our platform.
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">2. Service Description</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              CareerOnDoor provides a job search platform to connect users with job opportunities and company listings. We aim to simplify your job search by offering relevant information and resources. However, we do not guarantee the accuracy, completeness, or reliability of the information provided on our platform.
             </p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">3. User Responsibilities</h2>
-            <p>By using our website, you agree to:</p>
-            <ul className="list-disc pl-6 mb-4">
-              <li>
-                Provide accurate, current, and complete information when creating an account or interacting with the
-                platform.
-              </li>
-              <li>Not use the website for any illegal or unauthorized purpose.</li>
-              <li>Not upload, share, or distribute content that is offensive, harmful, or violates any laws.</li>
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">3. User Responsibilities</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8 mb-4">By using our website, you agree to:</p>
+            <ul className="list-disc pl-5 sm:pl-6 space-y-2 text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              <li>Provide accurate, current, and complete information when creating an account or interacting with the platform.</li>
+              <li>Refrain from using the website for any illegal or unauthorized purposes.</li>
+              <li>Avoid uploading, sharing, or distributing content that is offensive, harmful, or violates any applicable laws.</li>
             </ul>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">4. Information Disclaimer</h2>
-            <p>While we strive to provide helpful and accurate information:</p>
-            <ul className="list-disc pl-6 mb-4">
-              <li>
-                We do not guarantee the accuracy, completeness, or reliability of any job postings, company information,
-                or third-party content on the platform.
-              </li>
-              <li>
-                Users are responsible for verifying any job opportunities, company details, or other information before
-                taking any action, such as applying for jobs.
-              </li>
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">4. Information Disclaimer</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8 mb-4">While we strive to provide helpful and accurate information, we do not:</p>
+            <ul className="list-disc pl-5 sm:pl-6 space-y-2 text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              <li>Guarantee the accuracy, completeness, or reliability of job postings, company information, or third-party content on the platform.</li>
+              <li>Take responsibility for verifying job opportunities or company details; users must independently verify information before applying.</li>
             </ul>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">5. Use of Third-Party Services</h2>
-            <p>Our website may feature third-party services, including but not limited to:</p>
-            <ul className="list-disc pl-6 mb-4">
-              <li>
-                <strong>Google AdSense:</strong> To display ads based on your browsing activity and interests.
-              </li>
-              <li>
-                <strong>Google Analytics:</strong> To track user interactions and website performance.
-              </li>
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">5. Use of Third-Party Services</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8 mb-4">Our website integrates third-party services, including:</p>
+            <ul className="list-disc pl-5 sm:pl-6 space-y-2 text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              <li>Ad Networks: To display advertisements based on your browsing activity and interests.</li>
+              <li>Google Analytics: To track user interactions and optimize website performance.</li>
             </ul>
-            <p>
-              By using our website, you consent to the use of cookies and similar technologies to collect data,
-              including data related to your interactions with ads.
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8 mt-4">
+              By using our website, you consent to the use of cookies and similar technologies for data collection, including data related to ad interactions.
             </p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">6. Account Security</h2>
-            <p>
-              You are responsible for maintaining the confidentiality of your account login information. You agree to
-              notify us immediately of any unauthorized use of your account or any other security breach.
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">6. Account Security</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              You are responsible for maintaining the confidentiality of your account login information. Please notify us immediately at <a href="mailto:careerondoor@gmail.com" className="text-teal-600 hover:underline">careerondoor@gmail.com</a> if you suspect unauthorized use of your account or any security breach.
             </p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">7. Limitation of Liability</h2>
-            <p>
-              We are not responsible for any direct, indirect, incidental, or consequential damages resulting from the
-              use of our platform. This includes, but is not limited to, damages caused by errors or omissions in job
-              listings and other services, third-party links, or any disruption in service.
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">7. Limitation of Liability</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              We are not liable for any direct, indirect, incidental, or consequential damages resulting from your use of our platform, including damages from errors or omissions in job listings, third-party links, or service disruptions.
             </p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">8. Termination of Access</h2>
-            <p>
-              We reserve the right to suspend or terminate your access to the platform at our discretion, without
-              notice, for violations of these Terms or any unlawful activities.
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">8. Termination of Access</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              We reserve the right to suspend or terminate your access to the platform at our discretion, without notice, for violations of these Terms or any unlawful activities.
             </p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">9. Privacy and Data Protection</h2>
-            <p>
-              Our{" "}
-              <Link href="/privacy-policy" className="text-blue-600 hover:underline">
-                Privacy Policy
-              </Link>{" "}
-              outlines how we collect, use, and protect your personal information. By using our platform, you agree to
-              our Privacy Policy.
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">9. Privacy and Data Protection</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              Our <Link href="/privacy-policy" className="text-teal-600 hover:underline">Privacy Policy</Link> details how we collect, use, and protect your personal information. By using our platform, you agree to the terms outlined in our Privacy Policy.
             </p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">10. Changes to Terms</h2>
-            <p>
-              We may update these Terms and Conditions from time to time. Any changes will be posted on this page with
-              an updated effective date. It is your responsibility to check this page periodically for any updates.
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">10. Changes to Terms</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              We may update these Terms periodically. Changes will be posted on this page with an updated effective date. Please check this page regularly to stay informed of any updates.
             </p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">11. Contact Us</h2>
-            <p>If you have any questions about these Terms, please contact us:</p>
-            <ul className="list-disc pl-6 mb-4">
-              <li>By email: careerondoor@gmail.com</li>
+          <section className="mb-10 sm:mb-12">
+            <h2 className="text-2xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 border-l-4 border-teal-500 pl-3 sm:pl-4">11. Contact Us</h2>
+            <p className="text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">For questions about these Terms, please contact us at:</p>
+            <ul className="list-disc pl-5 sm:pl-6 space-y-2 text-gray-700 text-sm sm:text-base leading-7 sm:leading-8">
+              <li>Email: <a href="mailto:careerondoor@gmail.com" className="text-teal-600 hover:underline">careerondoor@gmail.com</a></li>
             </ul>
           </section>
 
-          <p className="text-gray-700 font-medium">
+          <p className="text-gray-700 text-sm sm:text-base font-medium text-center mt-10 sm:mt-12">
             By using our website, you agree to be bound by these Terms and Conditions.
           </p>
         </div>
@@ -163,4 +136,3 @@ export default function TermsOfServicePage() {
     </div>
   )
 }
-

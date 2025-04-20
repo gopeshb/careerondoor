@@ -11,18 +11,18 @@ export default function AdminDashboard() {
 
   const adminFeatures = [
     {
-      title: "Create Job Listings",
+      title: "Manage Jobs",
       description: "Post new job opportunities for companies in the system",
       icon: <Briefcase className="h-10 w-10 text-teal-500" />,
-      link: "/admin/create-job",
+      link: "/admin/verify-jobs",
       color: "bg-teal-50 border-teal-100",
       buttonColor: "text-teal-600 border-teal-200 hover:bg-teal-50",
     },
     {
-      title: "Create Internships",
+      title: "Manage Internships",
       description: "Post new internship opportunities for students",
       icon: <GraduationCap className="h-10 w-10 text-green-500" />,
-      link: "/admin/create-internship",
+      link: "/admin/verify-internships",
       color: "bg-green-50 border-green-100",
       buttonColor: "text-green-600 border-green-200 hover:bg-green-50",
     },

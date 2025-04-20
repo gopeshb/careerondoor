@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Lock, Mail } from 'lucide-react';
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import Link from "next/link";
 
 
@@ -68,7 +68,6 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
-      <Toaster />
       
       {/* Hero Section with Wavy Curve */}
       <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-16 pb-20 px-6 text-white">

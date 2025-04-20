@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import {
   Pagination,
@@ -16,8 +17,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Search, Briefcase } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Search, GraduationCap } from "lucide-react"
 import InternshipCard from "@/components/internship-card"
 
 // Define interfaces based on the actual API response
@@ -34,12 +34,16 @@ interface Company {
 interface Internship {
   _id: string
   role: string
+  duration: number
   description: string
-  location: string
+  country: string
+  cities: string[]
+  remote: boolean
   skills_required: string[]
-  companyId: Company
-  stipend: string
-  duration: number // Duration in months
+  company: Company
+  min_stipend?: number
+  max_stipend?: number
+  currency: string
   applylink: string
   last_date?: string
 }
@@ -47,6 +51,9 @@ interface Internship {
 interface SearchParams {
   keyword: string
   duration: string
+  country: string
+  city: string
+  remote: string
   page: number
 }
 
@@ -59,6 +66,9 @@ export default function Internships() {
   const [searchParams_, setSearchParams] = useState<SearchParams>({
     keyword: searchParams?.get("keyword") || "",
     duration: searchParams?.get("duration") || "",
+    country: searchParams?.get("country") || "",
+    city: searchParams?.get("city") || "",
+    remote: searchParams?.get("remote") || "",
     page: Number(searchParams?.get("page")) || 1,
   })
 
@@ -69,16 +79,37 @@ export default function Internships() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Duration options for filter
+  // State for location data
+  const [countries, setCountries] = useState<string[]>([])
+  const [cities, setCities] = useState<string[]>([])
+  const [loadingLocations, setLoadingLocations] = useState<boolean>(true)
+
+  // Duration options
   const durationOptions = [
-    { value: "all", label: "All Durations" },
     { value: "1", label: "1 Month" },
     { value: "2", label: "2 Months" },
     { value: "3", label: "3 Months" },
-    { value: "4", label: "4 Months" },
-    { value: "5", label: "5 Months" },
     { value: "6", label: "6 Months" },
+    { value: "12", label: "12 Months" },
   ]
+
+  // Fetch locations for filters
+  const fetchLocations = useCallback(async () => {
+    setLoadingLocations(true)
+    try {
+      const response = await fetch(`${BASE_API_URL}/api/internships/locations`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch locations")
+      }
+      const data = await response.json()
+      setCountries(data.countries)
+      setCities(data.cities)
+    } catch (err) {
+      console.error("Error fetching locations:", err)
+    } finally {
+      setLoadingLocations(false)
+    }
+  }, [BASE_API_URL])
 
   // Fetch internships based on search params
   const fetchInternships = useCallback(async () => {
@@ -92,14 +123,28 @@ export default function Internships() {
         queryParams.append("keyword", searchParams_.keyword)
       }
 
-      if (searchParams_.duration) {
+      if (searchParams_.duration && searchParams_.duration !== "all") {
         queryParams.append("duration", searchParams_.duration)
+      }
+
+      if (searchParams_.country && searchParams_.country !== "all") {
+        queryParams.append("country", searchParams_.country)
+      }
+
+      if (searchParams_.city && searchParams_.city !== "all") {
+        queryParams.append("city", searchParams_.city)
+      }
+
+      if (searchParams_.remote === "true") {
+        queryParams.append("remote", "true")
       }
 
       queryParams.append("page", searchParams_.page.toString())
       queryParams.append("limit", "10") // 10 internships per page
 
-      const response = await fetch(`${BASE_API_URL}/api/internships?${queryParams.toString()}`)
+      const response = await fetch(
+        `${BASE_API_URL}/api/internships${queryParams.toString() ? `?${queryParams.toString()}` : ""}`,
+      )
 
       if (!response.ok) {
         throw new Error("Failed to fetch internships")
@@ -108,7 +153,7 @@ export default function Internships() {
       const data = await response.json()
       setInternships(data.internships)
       setTotalInternships(data.totalInternships)
-      setTotalPages(Math.ceil(data.totalInternships / 10))
+      setTotalPages(data.totalPages)
     } catch (err) {
       setError((err as Error).message)
       setInternships([])
@@ -127,6 +172,18 @@ export default function Internships() {
 
     if (searchParams_.duration) {
       params.append("duration", searchParams_.duration)
+    }
+
+    if (searchParams_.country) {
+      params.append("country", searchParams_.country)
+    }
+
+    if (searchParams_.city) {
+      params.append("city", searchParams_.city)
+    }
+
+    if (searchParams_.remote === "true") {
+      params.append("remote", "true")
     }
 
     if (searchParams_.page > 1) {
@@ -148,9 +205,37 @@ export default function Internships() {
     setSearchParams((prev) => ({ ...prev, duration: value, page: 1 }))
   }
 
+  // Handle country filter change
+  const handleCountryChange = (value: string) => {
+    setSearchParams((prev) => ({ ...prev, country: value, city: "", page: 1 }))
+  }
+
+  // Handle city filter change
+  const handleCityChange = (value: string) => {
+    setSearchParams((prev) => ({ ...prev, city: value, page: 1 }))
+  }
+
+  // Handle remote filter change
+  const handleRemoteChange = (value: string) => {
+    setSearchParams((prev) => ({ ...prev, remote: value, page: 1 }))
+  }
+
   // Handle pagination
   const handlePageChange = (page: number) => {
     setSearchParams((prev) => ({ ...prev, page }))
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchParams({
+      keyword: "",
+      duration: "",
+      country: "",
+      city: "",
+      remote: "",
+      page: 1,
+    })
   }
 
   // Update URL when search params change
@@ -163,17 +248,22 @@ export default function Internships() {
     fetchInternships()
   }, [searchParams_, fetchInternships])
 
+  // Fetch locations on component mount
+  useEffect(() => {
+    fetchLocations()
+  }, [fetchLocations])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6 text-white">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Find Your Dream Internship</h1>
           <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto text-center mb-8">
             Discover top internship opportunities from leading companies and kickstart your career.
           </p>
 
-          <form onSubmit={handleSearch} className="max-w-3xl mx-auto relative">
+          <form onSubmit={handleSearch} className="max-w-4xl mx-auto relative">
             <div className="flex flex-col md:flex-row gap-2 bg-white/10 backdrop-blur-sm p-2 rounded-lg">
               <Input
                 type="text"
@@ -188,6 +278,7 @@ export default function Internships() {
                   <SelectValue placeholder="Duration" />
                 </SelectTrigger>
                 <SelectContent className="bg-white/90">
+                  <SelectItem value="all">All Durations</SelectItem>
                   {durationOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -204,6 +295,15 @@ export default function Internships() {
               </Button>
             </div>
           </form>
+          <div className="mt-8 text-center my-1 py-1">
+            <p className="mb-4 text-lg font-medium text-white/80">Have an opportunity to share?</p>
+            <Button
+              className="bg-white text-teal-600 font-semibold hover:bg-teal-50 hover:text-teal-700 transition-all duration-200 px-8 py-3 rounded-full shadow-md"
+              onClick={() => router.push("/internships/create-internship")}
+            >
+              Submit an Internship
+            </Button>
+          </div>
         </div>
 
         {/* Wave divider */}
@@ -227,9 +327,71 @@ export default function Internships() {
               <p className="text-gray-600 mt-1">
                 {totalInternships} {totalInternships === 1 ? "internship" : "internships"} found
                 {searchParams_.keyword && ` matching "${searchParams_.keyword}"`}
-                {searchParams_.duration &&
-                  ` for ${durationOptions.find((o) => o.value === searchParams_.duration)?.label.toLowerCase()}`}
               </p>
+            )}
+          </div>
+
+          {/* Additional filters */}
+          <div className="mt-4 sm:mt-0 flex flex-wrap gap-2">
+            <Select value={searchParams_.country} onValueChange={handleCountryChange} disabled={loadingLocations}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Country" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Countries</SelectItem>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={searchParams_.city}
+              onValueChange={handleCityChange}
+              disabled={loadingLocations || !searchParams_.country}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="City" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Cities</SelectItem>
+                {cities
+                  .filter(
+                    (city) =>
+                      !searchParams_.country ||
+                      internships.some(
+                        (internship) =>
+                          internship.country === searchParams_.country && internship.cities.includes(city),
+                      ),
+                  )
+                  .map((city) => (
+                    <SelectItem key={city} value={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={searchParams_.remote} onValueChange={handleRemoteChange}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Work Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="true">Remote Only</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {(searchParams_.keyword ||
+              searchParams_.duration ||
+              searchParams_.country ||
+              searchParams_.city ||
+              searchParams_.remote) && (
+              <Button variant="ghost" onClick={clearFilters} className="text-gray-500">
+                Clear Filters
+              </Button>
             )}
           </div>
         </div>
@@ -260,13 +422,10 @@ export default function Internships() {
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">Error: {error}</div>
         ) : internships.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
-            <Briefcase className="mx-auto h-12 w-12 text-gray-400" />
+            <GraduationCap className="mx-auto h-12 w-12 text-gray-400" />
             <p className="text-gray-500 text-lg mt-4">No internships found</p>
             <p className="text-gray-400 mt-2">Try adjusting your search filters</p>
-            <Button
-              className="mt-4 bg-purple-500 hover:bg-purple-600"
-              onClick={() => setSearchParams({ keyword: "", duration: "", page: 1 })}
-            >
+            <Button className="mt-4 bg-teal-500 hover:bg-teal-600" onClick={clearFilters}>
               Clear filters
             </Button>
           </div>
@@ -336,4 +495,3 @@ export default function Internships() {
     </div>
   )
 }
-

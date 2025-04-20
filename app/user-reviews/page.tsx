@@ -161,7 +161,7 @@ export default function UserReviews() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6 text-white">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6  text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Your Company Reviews</h1>
           <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto text-center mb-8">

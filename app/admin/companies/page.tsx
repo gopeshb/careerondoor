@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Loader2, Building2, CheckCircle, Trash2, AlertCircle, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { toast, Toaster } from "react-hot-toast"
+import { toast } from "react-hot-toast"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
@@ -117,9 +117,7 @@ export default function CompaniesPage() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-center" toastOptions={{
-    style: { zIndex: 9999 },
-  }}/>
+      
 
       <Card className="border-0 shadow-md">
         <CardHeader className="pb-3">

@@ -21,16 +21,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       active: pathname === "/admin",
     },
     {
-      name: "Create Job",
-      href: "/admin/create-job",
+      name: "Manage Jobs",
+      href: "/admin/verify-jobs",
       icon: <Briefcase className="h-5 w-5" />,
-      active: pathname === "/admin/create-job",
+      active: pathname === "/admin/verify-jobs",
     },
     {
-      name: "Create Internship",
-      href: "/admin/create-internship",
+      name: "Manage Internships",
+      href: "/admin/verify-internships",
       icon: <GraduationCap className="h-5 w-5" />,
-      active: pathname === "/admin/create-internship",
+      active: pathname === "/admin/verify-internships",
     },
     {
       name: "Manage Companies",
@@ -42,6 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <AdminRoute>
+      
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
         {/* Hero Section with Wavy Curve */}
         <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 pt-16 pb-20 px-6 text-white">

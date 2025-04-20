@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Toaster, toast } from "react-hot-toast"
+import { toast } from "react-hot-toast"
 import { LogOut, Edit, Save, Loader2, ShieldCheck, Star, AlertCircle, X } from "lucide-react"
 import Link from "next/link"
 
@@ -242,10 +242,9 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
-      <Toaster position="top-center" />
 
       {/* Hero Section with Wavy Curve */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-16 pb-20 px-6 text-white">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6  text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">My Profile</h1>
           <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto text-center">Manage your account information</p>

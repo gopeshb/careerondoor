@@ -1,4 +1,10 @@
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+
 export default function Loading() {
-  return null
+  return (
+    <LoadingSpinner />
+  )
+
+
 }
 

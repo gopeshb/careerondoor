@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Toaster, toast } from "react-hot-toast"
+import {  toast } from "react-hot-toast"
 import { ArrowLeft, Star, StarHalf, Briefcase, Shield, DollarSign, Building2, Loader2 } from "lucide-react"
 import Link from "next/link"
 
@@ -156,7 +156,7 @@ export default function EditReviewPage({ params }: { params:Promise<Params> }) {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
 
       {/* Hero Section with Wavy Curve */}
-      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-16 pb-20 px-6 text-white">
+      <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-24 pb-16 px-6  text-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center mb-8">
             <Link href="/user-reviews" className="flex items-center text-white hover:text-white/80 transition-colors">

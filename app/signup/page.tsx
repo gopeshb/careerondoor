@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
 import { ArrowLeft, CheckCircle } from "lucide-react"
 import Link from "next/link"
-
 
 // 🔹 Public image URLs for avatars
 const avatarOptions = [
@@ -27,7 +26,7 @@ function LoadingSpinner() {
 }
 
 export default function SignUpPage() {
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -39,8 +38,39 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([])
+  const [passwordTouched, setPasswordTouched] = useState(false)
+
+  // Password validation function
+  const validatePassword = (password: string): string[] => {
+    const errors: string[] = []
+
+    if (password.length < 6) {
+      errors.push("Password must be at least 6 characters long")
+    }
+
+    if (!/[A-Za-z]/.test(password)) {
+      errors.push("Password must contain at least one letter")
+    }
+
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
+      errors.push("Password must contain at least one special character")
+    }
+
+    return errors
+  }
+
+  // Check if password is valid
+  const isPasswordValid = passwordErrors.length === 0
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+
+    if (name === "password") {
+      if (!passwordTouched) setPasswordTouched(true)
+      setPasswordErrors(validatePassword(value))
+    }
   }
 
   const handleAvatarSelect = (avatar: string) => {
@@ -50,8 +80,18 @@ export default function SignUpPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    // Validate all required fields
     if (!formData.firstName || !formData.lastName || !formData.username || !formData.email || !formData.password) {
       toast.error("All fields are required!")
+      return
+    }
+
+    // Validate password
+    const passwordValidationErrors = validatePassword(formData.password)
+    if (passwordValidationErrors.length > 0) {
+      setPasswordErrors(passwordValidationErrors)
+      setPasswordTouched(true)
+      toast.error("Please fix the password errors before submitting")
       return
     }
 
@@ -68,15 +108,22 @@ export default function SignUpPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        toast.error(data.message || "Registration failed!")
-        setLoading(false)
+        // More specific error handling
+        if (data.error === "email_exists") {
+          toast.error("This email is already registered. Please use a different email.")
+        } else if (data.error === "username_exists") {
+          toast.error("This username is already taken. Please choose another one.")
+        } else {
+          toast.error(data.message || "Registration failed!")
+        }
         return
       }
 
       toast.success("OTP sent to your email!")
       router.push(`/verify-otp?email=${formData.email}`)
-    } catch (error) {
-      toast.error("Server error! Please try again.")
+    } catch (error: any) {
+      console.error("Registration error:", error)
+      toast.error(error.message || "Server error! Please try again.")
     } finally {
       setLoading(false)
     }
@@ -84,8 +131,6 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100">
-      <Toaster />
-
       {/* Hero Section with Wavy Curve */}
       <div className="relative bg-gradient-to-r from-teal-400 to-blue-500 pt-16 pb-20 px-6 text-white">
         <div className="max-w-7xl mx-auto">
@@ -174,7 +219,20 @@ export default function SignUpPage() {
                   placeholder="••••••••"
                   required
                   onChange={handleChange}
+                  className={passwordTouched && passwordErrors.length > 0 ? "border-red-500" : ""}
                 />
+                {passwordTouched && passwordErrors.length > 0 && (
+                  <div className="mt-1 space-y-1">
+                    {passwordErrors.map((error, index) => (
+                      <p key={index} className="text-xs text-red-500">
+                        {error}
+                      </p>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  Password must be at least 6 characters with 1 letter and 1 special character.
+                </p>
               </div>
 
               {/* Avatar Selection */}
@@ -189,12 +247,12 @@ export default function SignUpPage() {
                       }`}
                       onClick={() => handleAvatarSelect(avatar)}
                     >
-                      <img 
-  src={avatar || "/placeholder.svg"} 
-  alt="Avatar" 
-  className="w-full h-auto rounded-full" 
-  onContextMenu={(e) => e.preventDefault()} 
-/>
+                      <img
+                        src={avatar || "/placeholder.svg"}
+                        alt="Avatar"
+                        className="w-full h-auto rounded-full"
+                        onContextMenu={(e) => e.preventDefault()}
+                      />
 
                       {formData.avatar === avatar && (
                         <div className="absolute -top-1 -right-1 bg-teal-500 rounded-full p-0.5">
@@ -229,4 +287,3 @@ export default function SignUpPage() {
     </div>
   )
 }
-
