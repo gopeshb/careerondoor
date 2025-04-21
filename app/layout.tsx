@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-      
+      <meta name='impact-site-verification' value='bd3e6a98-117e-438b-a7ad-11f0aaa2d358'></meta>
 
       <meta name="google-site-verification" content="KEEzMzycN6LOuzLZTQ6dPnuOKG5_xzDBWlB8DMmQhsU" />
       </head>
