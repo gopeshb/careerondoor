@@ -30,6 +30,7 @@ export default function RootLayout({
       </head>
       <body data-new-gr-c-s-check-loaded="14.1096.0"
                          data-gr-ext-installed="">
+                           <p>Impact-Site-Verification: bd3e6a98-117e-438b-a7ad-11f0aaa2d358</p>
         <StoreProvider> 
         <Toaster
         position="top-center"
